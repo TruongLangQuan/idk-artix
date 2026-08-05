@@ -61,7 +61,70 @@ Artix Linux TTY ISO
 
 ---
 
-# 2. Universal Script Command Options
+# 2. Official Artix Wiki Live ISO NVMe Setup (2TB NVMe SSD: /dev/nvme0n1)
+
+Following the [Official Artix Linux Wiki Installation Guide](https://wiki.artixlinux.org/Main/Installation):
+
+### 1. Verify UEFI Boot Mode
+```bash
+ls /sys/firmware/efi/efivars
+```
+
+### 2. Partition 2TB NVMe SSD (`/dev/nvme0n1`)
+```bash
+cfdisk /dev/nvme0n1
+# Create p1: 1G (EFI System, Fat32)
+# Create p2: Remaining space (~2TB, Linux filesystem Btrfs)
+```
+
+### 3. Format Partitions & Create Btrfs Subvolumes
+```bash
+mkfs.fat -F32 /dev/nvme0n1p1
+mkfs.btrfs -f -L ARTIX /dev/nvme0n1p2
+
+mount /dev/nvme0n1p2 /mnt
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@home
+btrfs subvolume create /mnt/@cache
+btrfs subvolume create /mnt/@log
+btrfs subvolume create /mnt/@pkg
+btrfs subvolume create /mnt/@tmp
+btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/@swap
+umount /mnt
+```
+
+### 4. Mount System Subvolumes & Setup 16GB Swapfile
+```bash
+mount -o noatime,compress=zstd:3,subvol=@ /dev/nvme0n1p2 /mnt
+mkdir -p /mnt/{home,var/cache,var/log,var/cache/pacman/pkg,tmp,.snapshots,swap,boot/efi}
+
+mount -o noatime,compress=zstd:3,subvol=@home /dev/nvme0n1p2 /mnt/home
+mount -o noatime,compress=zstd:3,subvol=@cache /dev/nvme0n1p2 /mnt/var/cache
+mount -o noatime,compress=zstd:3,subvol=@log /dev/nvme0n1p2 /mnt/var/log
+mount -o noatime,compress=zstd:3,subvol=@pkg /dev/nvme0n1p2 /mnt/var/cache/pacman/pkg
+mount -o noatime,compress=zstd:3,subvol=@tmp /dev/nvme0n1p2 /mnt/tmp
+mount -o noatime,compress=zstd:3,subvol=@snapshots /dev/nvme0n1p2 /mnt/.snapshots
+mount -o noatime,subvol=@swap /dev/nvme0n1p2 /mnt/swap
+
+# Create 16GB Btrfs Swapfile inside @swap
+btrfs filesystem mkswapfile --size 16g --uuid clear /mnt/swap/swapfile
+swapon /mnt/swap/swapfile
+
+mount /dev/nvme0n1p1 /mnt/boot/efi
+```
+
+### 5. Basestrap & Chroot
+```bash
+basestrap /mnt base base-devel openrc elogind
+basestrap /mnt linux-zen linux-zen-headers linux-lts linux-lts-headers linux-firmware intel-ucode
+fstabgen -U /mnt >> /mnt/etc/fstab
+artix-chroot /mnt
+```
+
+---
+
+# 3. Universal Script Command Options
 
 Every automation script in `scripts/` supports standardized command-line flags:
 

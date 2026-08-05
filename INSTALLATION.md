@@ -495,13 +495,13 @@ pacman -S sudo
 Create:
 
 ```bash
-useradd -m -G wheel,audio,video,input tlquan
+useradd -m -G wheel,audio,video,input,seat truonglangquan
 ```
 
 Password:
 
 ```bash
-passwd tlquan
+passwd truonglangquan
 ```
 
 Enable sudo:
@@ -523,7 +523,7 @@ Uncomment:
 Add user:
 
 ```bash
-usermod -aG seat tlquan
+usermod -aG seat truonglangquan
 ```
 
 ---

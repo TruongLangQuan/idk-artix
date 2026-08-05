@@ -57,7 +57,7 @@ fi
 log_info "Root filesystem is Btrfs. Subvolumes detected:"
 btrfs subvolume list / || true
 
-REQUIRED_SUBVOLS=("@" "@home" "@cache" "@log" "@pkg" "@tmp" "@snapshots")
+REQUIRED_SUBVOLS=("@" "@home" "@cache" "@log" "@pkg" "@tmp" "@snapshots" "@swap")
 
 if [ "$IS_DRY_RUN" = true ]; then
     log_info "[DRY-RUN] Would verify existing subvolumes: ${REQUIRED_SUBVOLS[*]}"
