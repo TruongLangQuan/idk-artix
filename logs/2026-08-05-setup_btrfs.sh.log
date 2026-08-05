@@ -4,3 +4,9 @@
 [2026-08-05 23:29:38] [WARNING] Root filesystem is 'ext4', not 'btrfs'.
 [2026-08-05 23:29:38] [WARNING] Automatic disk re-partitioning or formatting is STRICTLY PROHIBITED.
 [2026-08-05 23:29:38] [WARNING] Please manually set up Btrfs following INSTALLATION.md if installing fresh.
+[2026-08-05 23:49:26] [INFO] Starting Btrfs filesystem configuration...
+[2026-08-05 23:49:26] [INFO] Current block devices:
+[2026-08-05 23:49:26] [INFO] Checking current filesystem type on root...
+[2026-08-05 23:49:26] [WARNING] Root filesystem is 'ext4', not 'btrfs'.
+[2026-08-05 23:49:26] [WARNING] Automatic disk re-partitioning or formatting is STRICTLY PROHIBITED.
+[2026-08-05 23:49:26] [WARNING] Please manually set up Btrfs following INSTALLATION.md if installing fresh.

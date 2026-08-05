@@ -3,3 +3,8 @@
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Config header source: /home/truonglangquan/idk-code/idk-artix/dotfiles/slstatus/config.h
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Would clone https://git.suckless.org/slstatus
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Would compile slstatus with make clean install
+[2026-08-05 23:49:26] [INFO] Starting slstatus build process...
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Target source directory: /home/truonglangquan/src/slstatus
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Config header source: /home/truonglangquan/idk-code/idk-artix/dotfiles/slstatus/config.h
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Would clone https://git.suckless.org/slstatus
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Would compile slstatus with make clean install

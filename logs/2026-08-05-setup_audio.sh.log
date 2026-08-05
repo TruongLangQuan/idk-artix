@@ -1,3 +1,6 @@
 [2026-08-05 23:29:39] [INFO] Starting audio setup...
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Would check and terminate standalone pulseaudio daemon if running.
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Would test wpctl status for PipeWire sinks and sources.
+[2026-08-05 23:49:26] [INFO] Starting audio setup...
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Would check and terminate standalone pulseaudio daemon if running.
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Would test wpctl status for PipeWire sinks and sources.

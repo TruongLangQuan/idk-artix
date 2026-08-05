@@ -8,3 +8,13 @@
 [2026-08-05 23:29:39] [INFO]   /home/truonglangquan/.config/mpv -> /home/truonglangquan/idk-code/idk-artix/dotfiles/mpv
 [2026-08-05 23:29:39] [INFO]   /home/truonglangquan/.config/fcitx5 -> /home/truonglangquan/idk-code/idk-artix/dotfiles/fcitx5
 [2026-08-05 23:29:39] [INFO]   /home/truonglangquan/.dwl/startup.sh -> /home/truonglangquan/idk-code/idk-artix/dotfiles/dwl/startup.sh
+[2026-08-05 23:49:26] [INFO] Starting dotfiles deployment...
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Symlinks to create:
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.bashrc -> /home/truonglangquan/idk-code/idk-artix/dotfiles/bash/.bashrc
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.config/foot -> /home/truonglangquan/idk-code/idk-artix/dotfiles/foot
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.config/fuzzel -> /home/truonglangquan/idk-code/idk-artix/dotfiles/fuzzel
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.config/nvim -> /home/truonglangquan/idk-code/idk-artix/dotfiles/nvim
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.config/swaylock -> /home/truonglangquan/idk-code/idk-artix/dotfiles/swaylock
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.config/mpv -> /home/truonglangquan/idk-code/idk-artix/dotfiles/mpv
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.config/fcitx5 -> /home/truonglangquan/idk-code/idk-artix/dotfiles/fcitx5
+[2026-08-05 23:49:26] [INFO]   /home/truonglangquan/.dwl/startup.sh -> /home/truonglangquan/idk-code/idk-artix/dotfiles/dwl/startup.sh

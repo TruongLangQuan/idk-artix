@@ -5,3 +5,10 @@
 [2026-08-05 23:29:39] [INFO] RAM: Mem:            15Gi       4.9Gi       451Mi       806Mi        11Gi        10Gi
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Would verify intel-ucode microcode loading.
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Would verify Mesa, vulkan-intel, and intel-media-driver VAAPI status.
+[2026-08-05 23:49:26] [INFO] Starting hardware detection and acceleration setup...
+[2026-08-05 23:49:26] [INFO] Detecting system hardware specs...
+[2026-08-05 23:49:26] [INFO] CPU: Model name:                              11th Gen Intel(R) Core(TM) i5-1145G7 @ 2.60GHz
+[2026-08-05 23:49:26] [INFO] GPU: 00:02.0 VGA compatible controller: Intel Corporation TigerLake-LP GT2 [Iris Xe Graphics] (rev 01)
+[2026-08-05 23:49:26] [INFO] RAM: Mem:            15Gi       4.9Gi       1.6Gi       727Mi       9.8Gi        10Gi
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Would verify intel-ucode microcode loading.
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Would verify Mesa, vulkan-intel, and intel-media-driver VAAPI status.

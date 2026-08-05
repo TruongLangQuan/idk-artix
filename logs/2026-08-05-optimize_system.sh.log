@@ -3,3 +3,8 @@
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] NVMe trim: Schedule fstrim weekly
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] Power profile: Set power-profiles-daemon to balanced
 [2026-08-05 23:29:39] [INFO] [DRY-RUN] ccache: Set CCACHE_DIR=/home/truonglangquan/.cache/ccache
+[2026-08-05 23:49:26] [INFO] Starting system optimization...
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] zram: Configure /etc/systemd/zram-generator.conf (or zram service) for 8GB
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] NVMe trim: Schedule fstrim weekly
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] Power profile: Set power-profiles-daemon to balanced
+[2026-08-05 23:49:26] [INFO] [DRY-RUN] ccache: Set CCACHE_DIR=/home/truonglangquan/.cache/ccache
