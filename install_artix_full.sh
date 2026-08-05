@@ -100,8 +100,15 @@ if [ "$SKIP_DISK" = false ] && ([ -f "/etc/artix-release" ] && grep -qi "live" /
     fi
     log_success "UEFI boot mode verified."
 
-    PART_EFI="${TARGET_DISK}p1"
-    PART_ROOT="${TARGET_DISK}p2"
+    # NVMe/mmcblk devices need a "p" before the partition number (nvme0n1p1),
+    # plain SATA/SCSI devices do not (sda1). Detect based on the disk name.
+    if [[ "$TARGET_DISK" =~ [0-9]$ ]]; then
+        PART_SUFFIX="p"
+    else
+        PART_SUFFIX=""
+    fi
+    PART_EFI="${TARGET_DISK}${PART_SUFFIX}1"
+    PART_ROOT="${TARGET_DISK}${PART_SUFFIX}2"
 
     if [ "$IS_DRY_RUN" = true ]; then
         log_info "[DRY-RUN] Would partition ${TARGET_DISK}: 1GB FAT32 EFI (${PART_EFI}) + Btrfs Root (${PART_ROOT})"
@@ -168,12 +175,20 @@ if [ "$SKIP_DISK" = false ] && ([ -f "/etc/artix-release" ] && grep -qi "live" /
             echo 'LANG=en_US.UTF-8' > /etc/locale.conf
             echo '${HOSTNAME}' > /etc/hostname
 
-            echo 'root:${ROOT_PASS}' | chpasswd
-            useradd -m -G wheel,audio,video,input,seat ${TARGET_USER}
-            echo '${TARGET_USER}:${TARGET_PASS}' | chpasswd
-            echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
+            pacman -Sy --noconfirm
+            pacman -S --noconfirm sudo grub efibootmgr btrfs-progs grub-btrfs \
+                networkmanager networkmanager-openrc \
+                dbus dbus-openrc \
+                seatd seatd-openrc \
+                bluez bluez-utils bluez-openrc
 
-            pacman -S --noconfirm grub efibootmgr btrfs-progs grub-btrfs networkmanager seatd dbus bluez
+            echo 'root:${ROOT_PASS}' | chpasswd
+            useradd -m -s /bin/bash -G wheel,audio,video,input,seat ${TARGET_USER}
+            echo '${TARGET_USER}:${TARGET_PASS}' | chpasswd
+            mkdir -p /etc/sudoers.d
+            echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
+            chmod 440 /etc/sudoers.d/wheel
+
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Artix
             grub-mkconfig -o /boot/grub/grub.cfg
 
@@ -274,13 +289,17 @@ log_info "-----------------------------------------------------------------"
 log_info "STAGE 3: OpenRC Init Services Activation"
 log_info "-----------------------------------------------------------------"
 
-SERVICES=("dbus" "seatd" "NetworkManager" "bluetooth" "ufw")
+SERVICES=("dbus" "seatd" "NetworkManager" "bluetoothd" "ufw")
 for svc in "${SERVICES[@]}"; do
     if [ "$IS_DRY_RUN" = true ]; then
         log_info "[DRY-RUN] Would activate OpenRC service: ${svc}"
     else
         if command -v rc-update >/dev/null 2>&1; then
-            sudo rc-update add "$svc" default 2>/dev/null || true
+            if [ -f "/etc/init.d/${svc}" ]; then
+                sudo rc-update add "$svc" default 2>/dev/null || true
+            else
+                log_warning "No /etc/init.d/${svc} found — install the '${svc}-openrc' package first, skipping."
+            fi
         fi
     fi
 done
@@ -307,8 +326,8 @@ log_info "-----------------------------------------------------------------"
 log_info "STAGE 5: Network & User Group Permissions"
 log_info "-----------------------------------------------------------------"
 
-GROUPS=("wheel" "audio" "video" "input" "seat")
-for grp in "${GROUPS[@]}"; do
+USER_GROUPS=("wheel" "audio" "video" "input" "seat")
+for grp in "${USER_GROUPS[@]}"; do
     if [ "$IS_DRY_RUN" = true ]; then
         log_info "[DRY-RUN] Would add user ${TARGET_USER} to group ${grp}"
     else
