@@ -1,0 +1,21 @@
+[2026-08-05 23:29:39] [INFO] ==================================================
+[2026-08-05 23:29:39] [INFO]       ARTIX SUCKLESS SYSTEM HEALTHCHECK REPORT    
+[2026-08-05 23:29:39] [INFO] ==================================================
+[2026-08-05 23:29:39] [INFO] --- Checking Kernel & Microcode ---
+[2026-08-05 23:29:39] [INFO] [PASS] [Kernel] Running kernel version: 7.0.11-zen1-1-zen
+[2026-08-05 23:29:39] [WARNING] [WARN] [Microcode] Microcode log not found in dmesg (or dmesg restricted).
+[2026-08-05 23:29:39] [INFO] --- Checking Hardware ---
+[2026-08-05 23:29:39] [INFO] [PASS] [CPU] 11th Gen Intel(R) Core(TM) i5-1145G7 @ 2.60GHz
+[2026-08-05 23:29:39] [INFO] [PASS] [RAM] Total: 15Gi, Available: 10Gi
+[2026-08-05 23:29:39] [WARNING] [WARN] [GPU] glxinfo tool not installed.
+[2026-08-05 23:29:39] [INFO] --- Checking Filesystem ---
+[2026-08-05 23:29:39] [WARNING] [WARN] [Filesystem] Root filesystem is ext4 (expected btrfs).
+[2026-08-05 23:29:39] [INFO] --- Checking OpenRC Services ---
+[2026-08-05 23:29:39] [WARNING] [WARN] [OpenRC] rc-status command not available.
+[2026-08-05 23:29:39] [INFO] --- Checking Display Environment ---
+[2026-08-05 23:29:39] [INFO] [PASS] [Wayland] Wayland session detected (wayland-1).
+[2026-08-05 23:29:39] [WARNING] [WARN] [dwl] dwl binary not found in PATH.
+[2026-08-05 23:29:39] [WARNING] [WARN] [slstatus] slstatus binary not found in PATH.
+[2026-08-05 23:29:39] [INFO] --- Checking Audio System ---
+[2026-08-05 23:29:39] [INFO] [PASS] [Audio] PipeWire & WirePlumber running normally.
+[2026-08-05 23:29:39] [INFO] --- Checking Security Status ---

@@ -1,0 +1,6 @@
+[2026-08-05 23:29:39] [INFO] Starting dwl build process...
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] Target source directory: /home/truonglangquan/src/dwl
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] Config header source: /home/truonglangquan/idk-code/idk-artix/dotfiles/dwl/config.h
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] Would clone https://codeberg.org/dwl/dwl.git
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] Would test patches using git apply --check
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] Would compile dwl with make clean install

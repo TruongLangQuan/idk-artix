@@ -1,0 +1,4 @@
+[2026-08-05 23:29:39] [INFO] Starting security hardening setup...
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] UFW policy: default deny incoming, default allow outgoing
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] Fail2Ban: configure /etc/fail2ban/jail.local with 1h bantime, maxretry=5
+[2026-08-05 23:29:39] [INFO] [DRY-RUN] Sysctl: apply kernel.randomize_va_space=2, net.ipv4.tcp_syncookies=1

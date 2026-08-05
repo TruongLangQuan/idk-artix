@@ -1,0 +1,14 @@
+# ~/.config/swaylock/config - Swaylock Monochrome Configuration
+# Version: 1.0
+
+color=000000
+font=JetBrains Mono
+indicator-radius=100
+indicator-thickness=7
+line-color=ffffff
+ring-color=ffffff
+key-hl-color=808080
+text-color=ffffff
+inside-color=000000
+show-failed-attempts
+no-unlock-indicator

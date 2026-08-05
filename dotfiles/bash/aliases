@@ -1,0 +1,32 @@
+# ~/.config/bash/aliases - System & Development Aliases
+# Version: 1.0
+
+# Navigation & Listing
+alias ls='eza --icons=never'
+alias ll='ls -lah'
+alias la='ls -A'
+alias l='ls -CF'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# Utilities
+alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
+alias c='clear'
+alias rg='rg --smart-case'
+alias cat='bat --style=plain --paging=never'
+
+# Git
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git log --oneline --graph'
+alias lg='lazygit'
+
+# System Maintenance & Rebuilds
+alias rebuild-dwl='cd ~/src/dwl && make clean && make && sudo make install'
+alias rebuild-slstatus='cd ~/src/slstatus && make clean && make && sudo make install'
+alias update-system='sudo pacman -Syu'
+alias healthcheck='~/scripts/healthcheck.sh'

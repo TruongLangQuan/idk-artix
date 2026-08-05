@@ -1,0 +1,12 @@
+# ~/.config/fcitx5/config - Fcitx5 Layout Config
+# Version: 1.0
+
+[Hotkey]
+# Trigger Key
+TriggerKeys=SUPER_SPACE
+
+[Hotkey/PrevPage]
+0=Page_Up
+
+[Hotkey/NextPage]
+0=Page_Down

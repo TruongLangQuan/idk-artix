@@ -1,0 +1,15 @@
+alsa-utils
+bluez
+bluez-utils
+intel-media-driver
+mpv
+mpvpaper
+pamixer
+pavucontrol
+pipewire
+pipewire-alsa
+pipewire-audio
+pipewire-pulse
+playerctl
+vlc
+wireplumber
