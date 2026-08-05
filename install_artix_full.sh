@@ -98,10 +98,13 @@ log_info "Swapfile Size:    ${SWAP_SIZE_GB}GB"
 log_info "Dry-Run Mode:     ${IS_DRY_RUN}"
 log_info "================================================================="
 
-# =================================================================
-# STAGE 0: LIVE ISO DISK PARTITIONING & BASE INSTALLATION
-# =================================================================
-if [ "$SKIP_DISK" = false ] && ([ -f "/etc/artix-release" ] && grep -qi "live" /etc/artix-release 2>/dev/null || [ -d "/run/archiso" ]); then
+# Detect Live ISO environment or non-Btrfs root filesystem
+IS_LIVE_ISO=false
+if [ "$(uname -n 2>/dev/null)" = "artix-live" ] || [ -d "/run/artix/bootmnt" ] || [ -d "/run/archiso" ] || [ -f "/etc/artix-release" ] || [ "$(findmnt -n -o FSTYPE / 2>/dev/null)" != "btrfs" ]; then
+    IS_LIVE_ISO=true
+fi
+
+if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
     log_info "-----------------------------------------------------------------"
     log_info "STAGE 0: Live ISO Disk Setup & Base System Bootstrap"
     log_info "-----------------------------------------------------------------"
@@ -256,7 +259,7 @@ else
             log_info "[DRY-RUN] Would install ${#VALID_TO_INSTALL[@]} valid packages via pacman."
         else
             log_info "Installing ${#VALID_TO_INSTALL[@]} valid missing packages..."
-            sudo pacman -S --needed --noconfirm "${VALID_TO_INSTALL[@]}"
+            echo -e "y\ny\ny\ny\ny\n" | sudo pacman -S --needed --noconfirm "${VALID_TO_INSTALL[@]}"
             create_checkpoint "packages"
         fi
     else

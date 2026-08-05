@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # install.sh - Top-Level Master Setup Launcher
-# Version: 2.0
+# Version: 3.0
 # Artix Linux OpenRC Suckless All-in-One Master Launcher
 
 set -euo pipefail
@@ -13,6 +13,6 @@ if [ ! -f "$FULL_INSTALLER" ]; then
     exit 1
 fi
 
-chmod +x "${FULL_INSTALLER}" "${SCRIPT_DIR}"/scripts/*.sh "${SCRIPT_DIR}"/scripts/lib/*.sh 2>/dev/null || true
+chmod +x "${FULL_INSTALLER}" 2>/dev/null || true
 
 exec bash "$FULL_INSTALLER" "$@"
