@@ -84,6 +84,22 @@ if [ -f "$DOTFILES_CONFIG" ]; then
     cp -f "$DOTFILES_CONFIG" "${BUILD_DIR}/config.h"
 fi
 
+log_info "Detecting installed wlroots pkg-config package..."
+FOUND_WLR=""
+for wver in wlroots-0.19 wlroots-0.20 wlroots0.20 wlroots-0.18 wlroots; do
+    if pkg-config --exists "$wver" 2>/dev/null; then
+        FOUND_WLR="$wver"
+        break
+    fi
+done
+
+if [ -n "$FOUND_WLR" ]; then
+    log_info "Found installed wlroots: ${FOUND_WLR}. Adjusting dwl Makefile..."
+    sed -i -E "s/wlroots-0\.[0-9]+/${FOUND_WLR}/g" Makefile
+else
+    log_warning "No wlroots pkg-config package detected via pkg-config."
+fi
+
 log_info "Compiling dwl..."
 make clean
 make
