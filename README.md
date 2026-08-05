@@ -331,6 +331,78 @@ Every major step must verify success before continuing.
 
 ---
 
+# Automation Scripts & Execution Order
+
+All automation scripts are stored in `scripts/`. They can be run all at once using the master `bootstrap.sh` orchestrator or executed individually in the strict sequence below.
+
+## Script Execution Sequence (Thứ tự thực thi script)
+
+| Step | Script File | Purpose |
+| --- | --- | --- |
+| 1 | `scripts/install_packages.sh` | Installs system packages from `packages/*.txt` |
+| 2 | `scripts/setup_btrfs.sh` | Configures Btrfs subvolumes, mounts & Snapper |
+| 3 | `scripts/setup_openrc.sh` | Enables required OpenRC init services |
+| 4 | `scripts/setup_hardware.sh` | Sets up Intel microcode, Mesa, Vulkan & VAAPI |
+| 5 | `scripts/setup_network.sh` | Configures NetworkManager, seatd & user groups |
+| 6 | `scripts/setup_audio.sh` | Configures PipeWire, WirePlumber & Bluetooth audio |
+| 7 | `scripts/setup_security.sh` | Configures UFW firewall, Fail2Ban & sysctl rules |
+| 8 | `scripts/build_dwl.sh` | Clones, patches & compiles dwl Wayland compositor |
+| 9 | `scripts/build_slstatus.sh` | Clones & compiles slstatus bar with native C modules |
+| 10 | `scripts/deploy_dotfiles.sh` | Backs up existing configs & symlinks `dotfiles/` |
+| 11 | `scripts/optimize_system.sh` | Configures zram, NVMe trim, power profile & ccache |
+| 12 | `scripts/healthcheck.sh` | Read-only diagnostic system health audit |
+
+---
+
+# Usage Instructions (Hướng dẫn sử dụng)
+
+### 1. Automated Full Setup (Recommended)
+Run all 12 stages sequentially with logging and checkpointing:
+
+```bash
+# Preview changes without modifying the system
+./scripts/bootstrap.sh --dry-run
+
+# Run full workstation installation
+./scripts/bootstrap.sh
+```
+
+### 2. Manual Step-by-Step Execution
+Run individual scripts in the exact sequence shown in the table above:
+
+```bash
+./scripts/install_packages.sh
+./scripts/setup_btrfs.sh
+./scripts/setup_openrc.sh
+./scripts/setup_hardware.sh
+./scripts/setup_network.sh
+./scripts/setup_audio.sh
+./scripts/setup_security.sh
+./scripts/build_dwl.sh
+./scripts/build_slstatus.sh
+./scripts/deploy_dotfiles.sh
+./scripts/optimize_system.sh
+./scripts/healthcheck.sh
+```
+
+### 3. Universal Script Flags
+Every script supports the following command-line flags:
+
+* `--dry-run` or `-d`: Simulates execution and outputs planned actions without changing system state.
+* `--help` or `-h`: Displays usage instructions, purpose, and safety warnings.
+
+### 4. Resumability & Checkpoint System
+Each completed stage creates a `.state/<stage>.done` marker. If a script is interrupted or re-run, completed stages are automatically skipped to guarantee idempotency and fast recovery.
+
+### 5. Diagnostics & Logging
+Logs for every execution are generated automatically in `logs/YYYY-MM-DD-<script_name>.log`. At any time, run the read-only healthcheck tool to verify system state:
+
+```bash
+./scripts/healthcheck.sh
+```
+
+---
+
 # Performance Goals
 
 Target idle usage

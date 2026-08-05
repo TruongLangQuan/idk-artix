@@ -28,8 +28,12 @@ EOF
 
 check_dry_run_flag "$@"
 
+IS_CLEAN=false
+
 for arg in "$@"; do
-    if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
+    if [ "$arg" = "--clean" ] || [ "$arg" = "-c" ]; then
+        IS_CLEAN=true
+    elif [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
         show_help
         exit 0
     fi
@@ -37,7 +41,11 @@ done
 
 log_info "Starting dwl build process..."
 
-if checkpoint_exists "dwl"; then
+if [ "$IS_CLEAN" = true ]; then
+    log_info "Clean rebuild requested. Clearing checkpoint and existing build directory..."
+    clear_checkpoint "dwl"
+    rm -rf "$HOME/src/dwl"
+elif checkpoint_exists "dwl"; then
     log_info "dwl build checkpoint exists (dwl.done). Skipping..."
     exit 0
 fi

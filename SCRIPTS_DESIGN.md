@@ -231,40 +231,29 @@ Flow:
 bootstrap
 
  |
-
- +-- check system
-
+ +-- 1. install_packages.sh
  |
-
- +-- install packages
-
+ +-- 2. setup_btrfs.sh
  |
-
- +-- configure OpenRC
-
+ +-- 3. setup_openrc.sh
  |
-
- +-- setup hardware
-
+ +-- 4. setup_hardware.sh
  |
-
- +-- build dwl
-
+ +-- 5. setup_network.sh
  |
-
- +-- build slstatus
-
+ +-- 6. setup_audio.sh
  |
-
- +-- deploy dotfiles
-
+ +-- 7. setup_security.sh
  |
-
- +-- optimize
-
+ +-- 8. build_dwl.sh
  |
-
- +-- healthcheck
+ +-- 9. build_slstatus.sh
+ |
+ +-- 10. deploy_dotfiles.sh
+ |
+ +-- 11. optimize_system.sh
+ |
+ +-- 12. healthcheck.sh
 ```
 
 ---
