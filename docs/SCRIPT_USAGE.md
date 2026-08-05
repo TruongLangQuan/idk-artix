@@ -122,6 +122,9 @@ fstabgen -U /mnt >> /mnt/etc/fstab
 artix-chroot /mnt
 ```
 
+> **Automated Live ISO Command**:
+> Alternatively, you can run `./scripts/setup_disk.sh --disk /dev/nvme0n1` directly from the Artix Live ISO terminal. It automates partitioning, formatting, subvolumes, swapfile, basestrap, fstabgen, and GRUB bootloader setup automatically!
+
 ---
 
 # 3. Universal Script Command Options

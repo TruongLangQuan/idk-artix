@@ -65,6 +65,10 @@ run_stage() {
     fi
 }
 
+if [ "${1:-}" = "--disk" ] || [ "${1:-}" = "--stage0" ] || ([ -f "/etc/artix-release" ] && grep -qi "live" /etc/artix-release 2>/dev/null); then
+    run_stage "setup_disk.sh" "Live ISO Disk Setup & Base System Installation"
+fi
+
 run_stage "install_packages.sh" "Package Installation"
 run_stage "setup_btrfs.sh"       "Btrfs Filesystem Checks"
 run_stage "setup_openrc.sh"      "OpenRC Services Setup"
