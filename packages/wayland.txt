@@ -18,11 +18,10 @@ pixman
 seatd
 slurp
 swaylock
-swww
 ttf-jetbrains-mono
 vulkan-intel
 wayland
 wayland-protocols
-wlroots
+wlroots0.20
 wl-clipboard
 xorg-xwayland

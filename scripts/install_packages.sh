@@ -49,7 +49,8 @@ PACKAGE_FILES=(
     "${PROJECT_ROOT}/packages/optional.txt"
 )
 
-TO_INSTALL=()
+VALID_TO_INSTALL=()
+SKIPPED_PACKAGES=()
 
 for pkg_file in "${PACKAGE_FILES[@]}"; do
     if [ -f "$pkg_file" ]; then
@@ -59,26 +60,35 @@ for pkg_file in "${PACKAGE_FILES[@]}"; do
             [[ -z "$pkg" || "$pkg" =~ ^# ]] && continue
             
             if ! pacman -Qi "$pkg" >/dev/null 2>&1; then
-                TO_INSTALL+=("$pkg")
+                if pacman -Si "$pkg" >/dev/null 2>&1; then
+                    VALID_TO_INSTALL+=("$pkg")
+                else
+                    SKIPPED_PACKAGES+=("$pkg")
+                    log_warning "Package '$pkg' not found in active pacman repositories. Skipping..."
+                fi
             fi
         done < "$pkg_file"
     fi
 done
 
-if [ ${#TO_INSTALL[@]} -eq 0 ]; then
-    log_info "All requested packages are already installed."
+if [ ${#SKIPPED_PACKAGES[@]} -gt 0 ]; then
+    log_warning "Skipped ${#SKIPPED_PACKAGES[@]} package(s) not found in pacman repos: ${SKIPPED_PACKAGES[*]}"
+fi
+
+if [ ${#VALID_TO_INSTALL[@]} -eq 0 ]; then
+    log_info "No missing valid packages to install via pacman."
     create_checkpoint "packages"
     exit 0
 fi
 
 if [ "$IS_DRY_RUN" = true ]; then
-    log_info "[DRY-RUN] Packages that would be installed (${#TO_INSTALL[@]} total):"
-    printf '  - %s\n' "${TO_INSTALL[@]}"
+    log_info "[DRY-RUN] Packages that would be installed (${#VALID_TO_INSTALL[@]} total):"
+    printf '  - %s\n' "${VALID_TO_INSTALL[@]}"
     exit 0
 fi
 
-log_info "Installing ${#TO_INSTALL[@]} missing packages..."
-sudo pacman -S --needed --noconfirm "${TO_INSTALL[@]}"
+log_info "Installing ${#VALID_TO_INSTALL[@]} valid missing packages..."
+sudo pacman -S --needed --noconfirm "${VALID_TO_INSTALL[@]}"
 
 create_checkpoint "packages"
 log_success "Package installation completed successfully."

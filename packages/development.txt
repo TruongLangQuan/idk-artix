@@ -1,6 +1,5 @@
 bat
 btop
-cargo
 ccache
 clang
 cmake
@@ -40,6 +39,6 @@ strace
 tmux
 tree
 valgrind
-yq
+go-yq
 zig
 zoxide

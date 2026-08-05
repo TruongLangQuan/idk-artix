@@ -3,7 +3,6 @@ bluez
 bluez-utils
 intel-media-driver
 mpv
-mpvpaper
 pamixer
 pavucontrol
 pipewire

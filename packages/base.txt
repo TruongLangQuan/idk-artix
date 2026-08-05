@@ -11,7 +11,6 @@ linux-firmware
 linux-lts
 linux-zen
 openrc
-openrc-base
 os-prober
 polkit
 snap-pac

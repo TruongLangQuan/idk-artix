@@ -8,7 +8,7 @@ networkmanager
 network-manager-applet
 nvme-cli
 nvtop
-p7zip
+7zip
 power-profiles-daemon
 powertop
 smartmontools
