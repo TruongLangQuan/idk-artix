@@ -366,6 +366,8 @@ EOF_SHIFT
 
         make clean && make
         sudo make install
+        sudo cp -f dwl /usr/bin/dwl 2>/dev/null || true
+        sudo cp -f dwl /usr/local/bin/dwl 2>/dev/null || true
         create_checkpoint "dwl"
     fi
 fi
