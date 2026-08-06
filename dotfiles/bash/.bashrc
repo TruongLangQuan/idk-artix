@@ -1,5 +1,5 @@
 # ~/.bashrc - Artix Suckless Workstation Bash Configuration
-# Version: 1.0
+# Version: 1.1
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
@@ -30,8 +30,8 @@ if [[ -f /usr/share/bash-completion/bash_completion ]]; then
     source /usr/share/bash-completion/bash_completion
 fi
 
-# Monochrome Prompt Setup
-PS1='\[\031[1;37m\]\u@\h\[\033[0m\]:\[\033[0;37m\]\w\[\033[0m\]\$ '
+# Clean Monochrome Prompt Setup (ESC code fixed)
+PS1='\[\033[1;37m\]\u@\h\[\033[0m\]:\[\033[0;37m\]\w\[\033[0m\]\$ '
 
 # Environment variables
 export EDITOR="nvim"

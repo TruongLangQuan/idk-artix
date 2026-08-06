@@ -1,6 +1,5 @@
 /* dwl config.h - Artix Suckless Workstation
- * Version: 1.1
- * Pure Monochrome Aesthetics & Keyboard-driven Workflow
+ * Version: 2.0 (With Native Built-in Top Bar & Custom Keybindings)
  */
 
 #include <X11/XF86keysym.h>
@@ -14,14 +13,22 @@
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if surface isn't visible */
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
+static const int showbar                   = 1;  /* 1 means show top bar */
+static const int topbar                    = 1;  /* 1 means bar is at top */
+static const char *fonts[]                 = {"JetBrains Mono:size=10"};
+
 static const float rootcolor[]             = COLOR(0x000000ff);
-static const float bordercolor[]           = COLOR(0x333333ff);
-static const float focuscolor[]            = COLOR(0x808080ff);
-static const float urgentcolor[]           = COLOR(0xffffffff);
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f};
 
-/* Tagging - Exactly 5 workspaces */
-#define TAGCOUNT (5)
+static uint32_t colors[][3]                = {
+	/*               fg          bg          border    */
+	[SchemeNorm] = { 0xccccccff, 0x000000ff, 0x333333ff },
+	[SchemeSel]  = { 0xffffffff, 0x222222ff, 0x808080ff },
+	[SchemeUrg]  = { 0xffffffff, 0x000000ff, 0xff0000ff },
+};
+
+/* Tagging - 5 Workspaces */
+static char *tags[] = { "1", "2", "3", "4", "5" };
 
 /* Logging */
 static int log_level = WLR_ERROR;
@@ -93,8 +100,10 @@ static const char *brightdown[]  = { "brightnessctl", "set", "10%-", NULL };
 
 static const Key keys[] = {
 	/* modifier                  key                 function        argument */
-	{ MODKEY,                    XKB_KEY_space,      spawn,          {.v = layoutcmd} },
 	{ MODKEY,                    XKB_KEY_d,          spawn,          {.v = menucmd} },
+	{ MODKEY,                    XKB_KEY_space,      spawn,          {.v = layoutcmd} },
+	{ MODKEY,                    XKB_KEY_f,          togglefullscreen,{0} },
+	{ MODKEY,                    XKB_KEY_e,          togglefullscreen,{0} },
 	{ MODKEY,                    XKB_KEY_t,          spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          spawn,          {.v = browsercmd} },
@@ -102,7 +111,6 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_l,          spawn,          {.v = lockcmd} },
 	{ MODKEY,                    XKB_KEY_v,          spawn,          {.v = clipcmd} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
-	{ MODKEY,                    XKB_KEY_e,          togglefullscreen,{0} },
 	{ 0,                         XKB_KEY_Print,      spawn,          {.v = shotcmd} },
 
 	/* Hardware media keys */
@@ -130,7 +138,15 @@ static const Key keys[] = {
 
 /* Mouse Buttons */
 static const Button buttons[] = {
-	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
-	{ MODKEY, BTN_MIDDLE, togglefloating, {0} },
-	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
+	{ ClkLtSymbol, 0,      BTN_LEFT,   setlayout,      {.v = &layouts[0]} },
+	{ ClkLtSymbol, 0,      BTN_RIGHT,  setlayout,      {.v = &layouts[2]} },
+	{ ClkTitle,    0,      BTN_MIDDLE, zoom,           {0} },
+	{ ClkStatus,   0,      BTN_MIDDLE, spawn,          {.v = termcmd} },
+	{ ClkClient,   MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
+	{ ClkClient,   MODKEY, BTN_MIDDLE, togglefloating, {0} },
+	{ ClkClient,   MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
+	{ ClkTagBar,   0,      BTN_LEFT,   view,           {0} },
+	{ ClkTagBar,   0,      BTN_RIGHT,  toggleview,     {0} },
+	{ ClkTagBar,   MODKEY, BTN_LEFT,   tag,            {0} },
+	{ ClkTagBar,   MODKEY, BTN_RIGHT,  toggletag,      {0} },
 };

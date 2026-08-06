@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# scripts/build_dwl.sh - Safe dwl Building & Customization Script
-# Version: 1.0
+# scripts/build_dwl.sh - Safe dwl Building & Customization Script (With Top Bar Patch)
+# Version: 2.0
 
 set -euo pipefail
 
@@ -21,8 +21,8 @@ Options:
   -h, --help       Show this help message.
 
 Description:
-  Clones dwl source code to ~/src/dwl, validates patches, applies monochrome
-  config.h, builds the binary, and installs dwl.
+  Clones dwl source code to ~/src/dwl, applies official top bar patch (bar.patch),
+  deploys custom config.h, builds the binary, and installs dwl.
 EOF
 }
 
@@ -57,10 +57,13 @@ if [ "$IS_DRY_RUN" = true ]; then
     log_info "[DRY-RUN] Target source directory: ${BUILD_DIR}"
     log_info "[DRY-RUN] Config header source: ${DOTFILES_CONFIG}"
     log_info "[DRY-RUN] Would clone https://codeberg.org/dwl/dwl.git"
-    log_info "[DRY-RUN] Would test patches using git apply --check"
+    log_info "[DRY-RUN] Would apply official top bar patch (bar.patch)"
     log_info "[DRY-RUN] Would compile dwl with make clean install"
     exit 0
 fi
+
+log_info "Ensuring bar patch dependencies (fcft, tllist, pixman) are installed..."
+sudo pacman -S --needed --noconfirm fcft tllist pixman libinput xkbcommon wayland-protocols || log_warning "Failed to pre-install bar patch dependencies."
 
 mkdir -p "$HOME/src"
 
@@ -75,6 +78,16 @@ fi
 
 cd "$BUILD_DIR"
 
+log_info "Downloading and applying official dwl top bar patch..."
+curl -sL "https://codeberg.org/dwl/dwl-patches/raw/branch/main/patches/bar/bar.patch" -o bar.patch
+if git apply --check bar.patch >/dev/null 2>&1; then
+    git apply bar.patch
+elif patch -p1 --dry-run < bar.patch >/dev/null 2>&1; then
+    patch -p1 < bar.patch
+else
+    log_warning "bar.patch already applied or could not be applied cleanly."
+fi
+
 if [ -f "config.h" ]; then
     backup_target "${BUILD_DIR}/config.h"
 fi
@@ -86,7 +99,7 @@ fi
 
 log_info "Detecting installed wlroots pkg-config package..."
 FOUND_WLR=""
-for wver in wlroots-0.19 wlroots-0.20 wlroots0.20 wlroots-0.18 wlroots; do
+for wver in wlroots-0.20 wlroots0.20 wlroots-0.19 wlroots0.19 wlroots-0.18 wlroots; do
     if pkg-config --exists "$wver" 2>/dev/null; then
         FOUND_WLR="$wver"
         break
@@ -96,11 +109,12 @@ done
 if [ -n "$FOUND_WLR" ]; then
     log_info "Found installed wlroots: ${FOUND_WLR}. Adjusting dwl Makefile..."
     sed -i -E "s/wlroots-0\.[0-9]+/${FOUND_WLR}/g" Makefile
+    sed -i -E "s/wlroots0\.[0-9]+/${FOUND_WLR}/g" Makefile
 else
     log_warning "No wlroots pkg-config package detected via pkg-config."
 fi
 
-log_info "Compiling dwl..."
+log_info "Compiling dwl with top bar support..."
 make clean
 make
 
@@ -108,4 +122,4 @@ log_info "Installing dwl..."
 sudo make install
 
 create_checkpoint "dwl"
-log_success "dwl built and installed successfully."
+log_success "dwl (with built-in top bar) built and installed successfully."

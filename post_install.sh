@@ -306,24 +306,36 @@ if [ "$IS_DRY_RUN" = true ]; then
     log_info "[DRY-RUN] Would clone dwl, apply custom config.h, auto-detect wlroots, & run make clean install"
 else
     if ! checkpoint_exists "dwl"; then
+        sudo pacman -S --needed --noconfirm fcft tllist pixman libinput xkbcommon wayland-protocols 2>/dev/null || true
         mkdir -p "$HOME/src"
         if [ ! -d "$BUILD_DIR_DWL" ]; then
             git clone https://codeberg.org/dwl/dwl.git "$BUILD_DIR_DWL"
         fi
         cd "$BUILD_DIR_DWL"
 
+        log_info "Downloading and applying official dwl top bar patch (bar.patch)..."
+        curl -sL "https://codeberg.org/dwl/dwl-patches/raw/branch/main/patches/bar/bar.patch" -o bar.patch
+        if git apply --check bar.patch >/dev/null 2>&1; then
+            git apply bar.patch
+        elif patch -p1 --dry-run < bar.patch >/dev/null 2>&1; then
+            patch -p1 < bar.patch
+        fi
+
         if [ -f "${SCRIPT_DIR}/dotfiles/dwl/config.h" ]; then
             cp -f "${SCRIPT_DIR}/dotfiles/dwl/config.h" "${BUILD_DIR_DWL}/config.h"
         fi
 
         FOUND_WLR=""
-        for wver in wlroots-0.19 wlroots-0.20 wlroots0.20 wlroots-0.18 wlroots; do
+        for wver in wlroots-0.20 wlroots0.20 wlroots-0.19 wlroots0.19 wlroots-0.18 wlroots; do
             if pkg-config --exists "$wver" 2>/dev/null; then
                 FOUND_WLR="$wver"
                 break
             fi
         done
-        [ -n "$FOUND_WLR" ] && sed -i -E "s/wlroots-0\.[0-9]+/${FOUND_WLR}/g" Makefile || true
+        if [ -n "$FOUND_WLR" ]; then
+            sed -i -E "s/wlroots-0\.[0-9]+/${FOUND_WLR}/g" Makefile || true
+            sed -i -E "s/wlroots0\.[0-9]+/${FOUND_WLR}/g" Makefile || true
+        fi
 
         make clean && make
         sudo make install
