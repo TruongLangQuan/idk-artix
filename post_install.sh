@@ -490,7 +490,7 @@ EOF_STARTUP
         sudo tee /usr/local/bin/startdwl >/dev/null << 'EOF_DWL_WRAPPER'
 #!/usr/bin/env bash
 [ -f "$HOME/.dwl/startup.sh" ] && bash "$HOME/.dwl/startup.sh" &
-exec dwl -s slstatus
+exec dwl -s "slstatus -s"
 EOF_DWL_WRAPPER
         sudo chmod +x /usr/local/bin/startdwl
         sudo cp -f /usr/local/bin/startdwl /usr/bin/startdwl 2>/dev/null || true

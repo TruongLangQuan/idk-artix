@@ -1,5 +1,5 @@
 /* dwl config.h - Artix Suckless Workstation
- * Version: 2.2 (Toggle Fuzzel Support & Top Bar Patch)
+ * Version: 2.1 (With Native Built-in Top Bar & TTY VT Switching Keys)
  */
 
 #include <X11/XF86keysym.h>
@@ -88,7 +88,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 /* Commands */
 static const char *termcmd[]    = { "foot", NULL };
-static const char *menucmd[]     = { "sh", "-c", "pkill -x fuzzel || fuzzel", NULL };
+static const char *menucmd[]     = { "fuzzel", NULL };
 static const char *browsercmd[]  = { "zen-browser", NULL };
 static const char *lockcmd[]     = { "swaylock", NULL };
 static const char *shotcmd[]     = { "sh", "-c", "grim -g \"$(slurp)\" ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).png", NULL };
