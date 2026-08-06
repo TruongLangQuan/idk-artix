@@ -30,8 +30,16 @@ if [[ -f /usr/share/bash-completion/bash_completion ]]; then
     source /usr/share/bash-completion/bash_completion
 fi
 
-# Clean Monochrome Prompt Setup (ESC code fixed)
-PS1='\[\033[1;37m\]\u@\h\[\033[0m\]:\[\033[0;37m\]\w\[\033[0m\]\$ '
+# Clean Monochrome Prompt Setup (ANSI-C Escapes)
+C_WHITE=$'\e[1;37m'
+C_GRAY=$'\e[0;37m'
+C_RESET=$'\e[0m'
+
+if [ "${EUID:-$(id -u)}" -eq 0 ]; then
+    PS1='\[ '"$C_WHITE"'\]\u@\h\['"$C_RESET"'\]:\['"$C_GRAY"'\]\w\['"$C_RESET"'\]# '
+else
+    PS1='\[ '"$C_WHITE"'\]\u@\h\['"$C_RESET"'\]:\['"$C_GRAY"'\]\w\['"$C_RESET"'\]\$ '
+fi
 
 # Environment variables
 export EDITOR="nvim"

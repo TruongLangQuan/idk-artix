@@ -1,6 +1,5 @@
 /* slstatus config.h - Artix Suckless Workstation Status Bar Config
- * Version: 2.0
- * Universal hardware metrics as documented in README.md.
+ * Version: 2.1 (RAM in MB/Total, Network Name/State, CPU, SSD, Date/Time)
  */
 
 /* interval between updates (in ms) */
@@ -14,9 +13,10 @@ static const char unknown_str[] = "n/a";
 
 static const struct arg args[] = {
 	/* function     format                   argument */
-	{ ram_perc,     " [RAM %s%%]",           NULL },
+	{ ram_used,     " [RAM %s/",             NULL },
+	{ ram_total,    "%s]",                   NULL },
 	{ cpu_perc,     " [CPU %s%%]",           NULL },
-	{ temp,         " [TEMP %s°C]",          "/sys/class/thermal/thermal_zone0/temp" },
+	{ run_command,  " [NET %s]",             "nmcli -t -f active,ssid dev wifi 2>/dev/null | grep '^yes' | cut -d: -f2 || ip route get 1 2>/dev/null | awk '{print $5}' || echo 'Offline'" },
 	{ disk_perc,    " [SSD %s%%]",           "/" },
 	{ datetime,     " | %s",                 "%Y-%m-%d %H:%M:%S" },
 };
