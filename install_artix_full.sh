@@ -19,7 +19,7 @@ TARGET_DISK="/dev/nvme0n1"
 TARGET_USER="truonglangquan"
 TARGET_PASS="15031169"
 ROOT_PASS="15031169"
-HOSTNAME="artix-suckless"
+HOSTNAME="tlquan"
 SWAP_SIZE_GB="16"
 IS_DRY_RUN=false
 SKIP_DISK=false
@@ -131,12 +131,22 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
             exit 0
         fi
 
-        log_info "Wiping partition table on ${TARGET_DISK}..."
-        sudo sgdisk --zap-all "${TARGET_DISK}" || true
+        if ! command -v sgdisk >/dev/null 2>&1 && ! command -v parted >/dev/null 2>&1; then
+            log_info "Installing partitioning tools (gptfdisk & parted)..."
+            sudo pacman -Sy --noconfirm gptfdisk parted || true
+        fi
 
-        log_info "Creating GPT partitions..."
-        sudo sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI System Partition" "${TARGET_DISK}"
-        sudo sgdisk -n 2:0:0   -t 2:8300 -c 2:"Artix Root Btrfs" "${TARGET_DISK}"
+        log_info "Creating GPT partitions on ${TARGET_DISK}..."
+        if command -v parted >/dev/null 2>&1; then
+            sudo parted -s "${TARGET_DISK}" mklabel gpt
+            sudo parted -s "${TARGET_DISK}" mkpart "EFI" fat32 1MiB 1025MiB
+            sudo parted -s "${TARGET_DISK}" set 1 esp on
+            sudo parted -s "${TARGET_DISK}" mkpart "Root" btrfs 1025MiB 100%
+        elif command -v sgdisk >/dev/null 2>&1; then
+            sudo sgdisk --zap-all "${TARGET_DISK}" || true
+            sudo sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI System Partition" "${TARGET_DISK}"
+            sudo sgdisk -n 2:0:0   -t 2:8300 -c 2:"Artix Root Btrfs" "${TARGET_DISK}"
+        fi
 
         log_info "Formatting FAT32 & Btrfs..."
         sudo mkfs.fat -F32 "${PART_EFI}"
@@ -173,7 +183,7 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
         sudo swapon /mnt/swap/swapfile
 
         log_info "Bootstrapping base system..."
-        sudo basestrap /mnt base base-devel openrc elogind linux-zen linux-zen-headers linux-lts linux-lts-headers linux-firmware intel-ucode
+        sudo basestrap /mnt base base-devel openrc elogind-openrc linux-zen linux-zen-headers linux-lts linux-lts-headers linux-firmware intel-ucode
 
         log_info "Generating fstab..."
         sudo fstabgen -U /mnt | sudo tee -a /mnt/etc/fstab
@@ -193,13 +203,15 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
             echo '${TARGET_USER}:${TARGET_PASS}' | chpasswd
             echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
 
-            pacman -S --noconfirm grub efibootmgr btrfs-progs grub-btrfs networkmanager seatd dbus bluez
+            pacman -S --noconfirm --needed grub efibootmgr btrfs-progs grub-btrfs networkmanager networkmanager-openrc seatd seatd-openrc dbus dbus-openrc bluez bluez-openrc ufw ufw-openrc
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Artix
             grub-mkconfig -o /boot/grub/grub.cfg
 
             rc-update add NetworkManager default
             rc-update add dbus default
             rc-update add seatd default
+            rc-update add bluetooth default
+            rc-update add ufw default
         "
 
         # Copy installer file to new system user directory for post-reboot run
@@ -223,18 +235,19 @@ if checkpoint_exists "packages"; then
     log_info "Package installation checkpoint exists. Skipping..."
 else
     PACKAGES=(
-        base base-devel btrfs-progs dbus efibootmgr grub grub-btrfs intel-ucode
-        linux-firmware linux-lts linux-zen os-prober polkit snap-pac snapper sudo zram-generator
-        bash-completion brightnessctl cairo cliphist fcitx5 fcitx5-configtool fcitx5-unikey
-        foot fuzzel grim libinput libva libva-utils libxkbcommon mesa pango pixman seatd slurp
-        swaylock ttf-jetbrains-mono vulkan-intel wayland wayland-protocols wlroots0.20 wlroots0.19
-        wl-clipboard xorg-xwayland bat btop ccache clang cmake eza fastfetch fd file fzf gcc gdb
-        git go htop jdk-openjdk jq lazygit less lldb llvm ltrace lua make meson nano neovim ninja
-        nodejs npm openssh pkgconf python python-pip ripgrep rsync rust strace tmux tree valgrind
-        go-yq zig zoxide alsa-utils bluez bluez-utils intel-media-driver mpv pamixer pavucontrol
-        pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber fail2ban ufw 7zip curl
-        wget unzip hwinfo lm_sensors networkmanager network-manager-applet nvme-cli nvtop
-        power-profiles-daemon powertop smartmontools
+        base base-devel btrfs-progs dbus dbus-openrc efibootmgr openrc elogind-openrc
+        grub grub-btrfs intel-ucode linux-firmware linux-lts linux-zen os-prober polkit snap-pac
+        snapper sudo zram-init zram-init-openrc bash-completion brightnessctl cairo cliphist
+        fcitx5 fcitx5-configtool fcitx5-unikey foot fuzzel grim libinput libva libva-utils
+        libxkbcommon mesa pango pixman seatd seatd-openrc slurp swaylock ttf-jetbrains-mono
+        vulkan-intel wayland wayland-protocols wlroots0.20 wlroots0.19 wl-clipboard xorg-xwayland
+        bat btop ccache clang cmake eza fastfetch fd file fzf gcc gdb git go htop jdk-openjdk jq
+        lazygit less lldb llvm ltrace lua make meson nano neovim ninja nodejs npm openssh pkgconf
+        python python-pip ripgrep rsync rust strace tmux tree valgrind go-yq zig zoxide
+        alsa-utils bluez bluez-utils bluez-openrc intel-media-driver mpv pamixer pavucontrol
+        pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber fail2ban ufw ufw-openrc
+        7zip curl wget unzip hwinfo lm_sensors networkmanager networkmanager-openrc
+        network-manager-applet nvme-cli nvtop power-profiles-daemon powertop smartmontools
     )
 
     VALID_TO_INSTALL=()
