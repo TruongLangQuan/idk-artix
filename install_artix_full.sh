@@ -294,12 +294,35 @@ else
         else
             log_info "Installing ${#VALID_TO_INSTALL[@]} valid missing packages..."
             echo -e "y\ny\ny\ny\ny\n" | sudo pacman -S --needed --noconfirm "${VALID_TO_INSTALL[@]}"
-            create_checkpoint "packages"
         fi
     else
-        log_info "All requested packages are already installed."
-        create_checkpoint "packages"
+        log_info "All requested official packages are already installed."
     fi
+
+    # AUR Helper Bootstrap & AUR Packages
+    AUR_HELPER=""
+    if command -v paru >/dev/null 2>&1; then
+        AUR_HELPER="paru"
+    elif command -v yay >/dev/null 2>&1; then
+        AUR_HELPER="yay"
+    elif [ "$IS_DRY_RUN" = false ]; then
+        log_info "Bootstrapping AUR helper (paru-bin)..."
+        rm -rf /tmp/paru-bin
+        git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin
+        (cd /tmp/paru-bin && makepkg -si --noconfirm) || log_warning "Failed to build paru-bin from AUR."
+        rm -rf /tmp/paru-bin
+        if command -v paru >/dev/null 2>&1; then
+            AUR_HELPER="paru"
+        fi
+    fi
+
+    AUR_PACKAGES=("zen-browser-bin" "mpvpaper")
+    if [ -n "$AUR_HELPER" ] && [ "$IS_DRY_RUN" = false ]; then
+        log_info "Installing AUR packages (${AUR_PACKAGES[*]}) via ${AUR_HELPER}..."
+        $AUR_HELPER -S --needed --noconfirm "${AUR_PACKAGES[@]}" || log_warning "Some AUR packages could not be installed."
+    fi
+
+    create_checkpoint "packages"
 fi
 
 # =================================================================
@@ -664,6 +687,22 @@ ring-color=333333
 line-color=000000
 key-hl-color=ffffff
 EOF_SWAYLOCK
+
+    # Deploy MPV config
+    mkdir -p "${HOME}/.config/mpv"
+    cat << 'EOF_MPV' > "${HOME}/.config/mpv/mpv.conf"
+hwdec=auto
+vo=gpu
+profile=fast
+gpu-api=vulkan
+EOF_MPV
+
+    # Deploy Fcitx5 config
+    mkdir -p "${HOME}/.config/fcitx5"
+    cat << 'EOF_FCITX' > "${HOME}/.config/fcitx5/config"
+[Hotkey]
+TriggerKeys=Control+space
+EOF_FCITX
 
     # Deploy DWL Startup script
     mkdir -p "${HOME}/.dwl"
