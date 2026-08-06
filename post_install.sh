@@ -107,7 +107,11 @@ else
             log_info "[DRY-RUN] Would install ${#VALID_TO_INSTALL[@]} valid packages via pacman."
         else
             log_info "Installing ${#VALID_TO_INSTALL[@]} valid missing packages..."
-            echo -e "y\ny\ny\ny\ny\n" | sudo pacman -S --needed --noconfirm "${VALID_TO_INSTALL[@]}"
+            # Automatically resolve pipewire-jack vs jack2 provider conflict
+            if pacman -Qi jack2 >/dev/null 2>&1; then
+                sudo pacman -Rdd --noconfirm jack2 2>/dev/null || true
+            fi
+            yes | sudo pacman -S --needed --noconfirm "${VALID_TO_INSTALL[@]}"
         fi
     else
         log_info "All requested official packages are already installed."
@@ -177,7 +181,10 @@ audit_markdown_packages() {
             log_info "[DRY-RUN] Would install ${#md_missing[@]} missing Markdown-documented packages: ${md_missing[*]}"
         else
             log_info "Installing ${#md_missing[@]} missing packages documented in Markdown: ${md_missing[*]}"
-            echo -e "y\ny\ny\ny\ny\n" | sudo pacman -S --needed --noconfirm "${md_missing[@]}" || log_warning "Some packages could not be installed."
+            if pacman -Qi jack2 >/dev/null 2>&1; then
+                sudo pacman -Rdd --noconfirm jack2 2>/dev/null || true
+            fi
+            yes | sudo pacman -S --needed --noconfirm "${md_missing[@]}" || log_warning "Some packages could not be installed."
         fi
     else
         log_success "All required packages documented in Markdown files are fully installed!"
