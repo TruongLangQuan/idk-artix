@@ -1,5 +1,5 @@
 /* dwl config.h - Artix Suckless Workstation
- * Version: 2.3 (With Built-in Top Bar, Shiftview, & Full TTY Switch Keys)
+ * Version: 2.5 (9 Workspaces, Top Bar, Shiftview, TTY Switching, & Keybind Tutorial Popup)
  */
 
 #include <X11/XF86keysym.h>
@@ -27,16 +27,17 @@ static uint32_t colors[][3]                = {
 	[SchemeUrg]  = { 0xffffffff, 0x000000ff, 0xff0000ff },
 };
 
-/* Tagging - 5 Workspaces */
-static char *tags[] = { "1", "2", "3", "4", "5" };
+/* Tagging - 9 Workspaces */
+static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 /* Logging */
 static int log_level = WLR_ERROR;
 
 /* Rules */
 static const Rule rules[] = {
-	/* app_id     title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       0,            1,           -1 },
+	/* app_id          title       tags mask     isfloating   monitor */
+	{ "Gimp",          NULL,       0,            1,           -1 },
+	{ "foot-keybinds", NULL,       0,            1,           -1 },
 };
 
 /* Layouts */
@@ -99,6 +100,7 @@ static const char *lockcmd[]     = { "swaylock", "-f", NULL };
 static const char *shotcmd[]     = { "sh", "-c", "grim -g \"$(slurp)\" ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).png", NULL };
 static const char *clipcmd[]     = { "sh", "-c", "cliphist list | fuzzel | cliphist decode | wl-copy", NULL };
 static const char *layoutcmd[]   = { "fcitx5-remote", "-t", NULL };
+static const char *helpcmd[]     = { "keybind-help", NULL };
 static const char *volup[]       = { "pamixer", "-i", "5", NULL };
 static const char *voldown[]     = { "pamixer", "-d", "5", NULL };
 static const char *volmute[]     = { "pamixer", "-t", NULL };
@@ -109,10 +111,16 @@ static const Key keys[] = {
 	/* modifier                  key                 function        argument */
 	{ MODKEY,                    XKB_KEY_d,          spawn,          {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_space,      spawn,          {.v = layoutcmd} },
+	{ MODKEY,                    XKB_KEY_F1,         spawn,          {.v = helpcmd} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_H,          spawn,          {.v = helpcmd} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_slash,      spawn,          {.v = helpcmd} },
 	{ MODKEY,                    XKB_KEY_f,          togglefullscreen,{0} },
 	{ MODKEY,                    XKB_KEY_e,          togglefullscreen,{0} },
 	{ MODKEY,                    XKB_KEY_s,          togglefloating, {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_T,          setlayout,      {.v = &layouts[0]} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F,          setlayout,      {.v = &layouts[1]} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_M,          setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                    XKB_KEY_t,          spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          spawn,          {.v = browsercmd} },
@@ -144,12 +152,16 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_h,          setmfact,       {.f = -0.05f} },
 	{ MODKEY,                    XKB_KEY_l,          setmfact,       {.f = +0.05f} },
 
-	/* Workspaces 1..5 */
-	TAGKEYS(                     XKB_KEY_1,          XKB_KEY_exclam,  0),
-	TAGKEYS(                     XKB_KEY_2,          XKB_KEY_at,      1),
-	TAGKEYS(                     XKB_KEY_3,          XKB_KEY_numbersign, 2),
-	TAGKEYS(                     XKB_KEY_4,          XKB_KEY_dollar,  3),
-	TAGKEYS(                     XKB_KEY_5,          XKB_KEY_percent, 4),
+	/* Workspaces 1..9 */
+	TAGKEYS(                     XKB_KEY_1,          XKB_KEY_exclam,      0),
+	TAGKEYS(                     XKB_KEY_2,          XKB_KEY_at,          1),
+	TAGKEYS(                     XKB_KEY_3,          XKB_KEY_numbersign,  2),
+	TAGKEYS(                     XKB_KEY_4,          XKB_KEY_dollar,      3),
+	TAGKEYS(                     XKB_KEY_5,          XKB_KEY_percent,     4),
+	TAGKEYS(                     XKB_KEY_6,          XKB_KEY_asciicircum, 5),
+	TAGKEYS(                     XKB_KEY_7,          XKB_KEY_ampersand,   6),
+	TAGKEYS(                     XKB_KEY_8,          XKB_KEY_asterisk,    7),
+	TAGKEYS(                     XKB_KEY_9,          XKB_KEY_parenleft,   8),
 
 	/* Virtual Terminal (TTY) Switching (Ctrl+Alt+F1..F12) */
 	CHVT(1), CHVT(2), CHVT(3), CHVT(4), CHVT(5), CHVT(6),

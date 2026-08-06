@@ -100,16 +100,16 @@ shiftview(const Arg *arg)
 	int i, tag = 0;
 	if (!selmon) return;
 	cur = selmon->tagset[selmon->seltags];
-	for (i = 0; i < 5; i++) {
+	for (i = 0; i < 9; i++) {
 		if (cur & (1 << i)) {
 			tag = i;
 			break;
 		}
 	}
 	if (arg->i > 0)
-		tag = (tag + 1) % 5;
+		tag = (tag + 1) % 9;
 	else
-		tag = (tag - 1 + 5) % 5;
+		tag = (tag - 1 + 9) % 9;
 	a.ui = 1 << tag;
 	view(&a);
 }

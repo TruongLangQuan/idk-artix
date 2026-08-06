@@ -1,13 +1,14 @@
 # ~/.config/swaylock/config - Swaylock Monochrome Configuration
-# Version: 1.1
+# Version: 1.2 (With Always-Visible Unlock Ring Indicator)
 
-color=000000
+color=1a1a1a
 font=JetBrains Mono
-indicator-radius=90
-indicator-thickness=6
-line-color=000000
+indicator-radius=100
+indicator-thickness=8
+line-color=333333
 ring-color=ffffff
-inside-color=000000
+inside-color=1a1a1a
 key-hl-color=808080
 text-color=ffffff
 show-failed-attempts
+indicator-idle-visible=yes

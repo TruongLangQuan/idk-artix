@@ -81,6 +81,7 @@ make
 
 log_info "Installing slstatus..."
 sudo make install
+sudo cp -f slstatus /usr/bin/slstatus 2>/dev/null || true
 
 create_checkpoint "slstatus"
 log_success "slstatus built and installed successfully."

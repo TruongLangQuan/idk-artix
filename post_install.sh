@@ -332,16 +332,16 @@ shiftview(const Arg *arg)
 	int i, tag = 0;
 	if (!selmon) return;
 	cur = selmon->tagset[selmon->seltags];
-	for (i = 0; i < 5; i++) {
+	for (i = 0; i < 9; i++) {
 		if (cur & (1 << i)) {
 			tag = i;
 			break;
 		}
 	}
 	if (arg->i > 0)
-		tag = (tag + 1) % 5;
+		tag = (tag + 1) % 9;
 	else
-		tag = (tag - 1 + 5) % 5;
+		tag = (tag - 1 + 9) % 9;
 	a.ui = 1 << tag;
 	view(&a);
 }
@@ -394,6 +394,7 @@ else
 
         make clean && make
         sudo make install
+        sudo cp -f slstatus /usr/bin/slstatus 2>/dev/null || true
         create_checkpoint "slstatus"
     fi
 fi
@@ -523,6 +524,56 @@ exec slstatus -s | dwl
 EOF_DWL_WRAPPER
         sudo chmod +x /usr/local/bin/startdwl
         sudo cp -f /usr/local/bin/startdwl /usr/bin/startdwl 2>/dev/null || true
+
+        # Deploy keybind-help tutorial script
+        sudo tee /usr/local/bin/keybind-help >/dev/null << 'EOF_HELP'
+#!/usr/bin/env bash
+exec foot --app-id=foot-keybinds --title="Artix DWL Keybindings Tutorial" bash -c '
+cat << "EOF_TXT"
+===================================================================
+                  ARTIX DWL KEYBINDINGS TUTORIAL                   
+===================================================================
+
+[LAUNCHERS & CORE]
+  Super + d               Toggle Fuzzel Application Launcher
+  Super + Return / t      Launch Foot Terminal
+  Super + b               Launch Zen Web Browser
+  Super + q               Kill / Close Focused Window
+  Super + l               Lock Screen (Swaylock)
+  Super + Space           Toggle Keyboard Layout (US <-> Vietnamese)
+  Super + v               Clipboard History Picker (cliphist + fuzzel)
+  PrintScreen             Take Region Screenshot (grim + slurp)
+  Super + F1 / Shift + H  Open This Keybinding Tutorial
+
+[WINDOW LAYOUT & FLOATING TOGGLES]
+  Super + s               Toggle Focused Window (Floating <-> Tiling)
+  Super + Shift + Space   Toggle Focused Window (Floating <-> Tiling)
+  Super + Shift + T       Switch Workspace Layout to Tiling [[]=]
+  Super + Shift + F       Switch Workspace Layout to Floating [><>]
+  Super + Shift + M       Switch Workspace Layout to Monocle [[M]]
+  Super + f               Toggle Fullscreen Mode
+
+[WORKSPACE NAVIGATION]
+  Super + 1 .. 9          Switch to Workspace 1..9
+  Super + Shift + 1 .. 9  Move Window to Workspace 1..9
+  Super + Ctrl + Arrows   Cycle Next / Previous Workspace
+  Ctrl + Shift + Arrows   Cycle Next / Previous Workspace
+
+[VIRTUAL TERMINAL (TTY)]
+  Ctrl + Alt + F1         Switch back to DWL Wayland Desktop
+  Ctrl + Alt + F2 .. F6   Switch to Linux TTY Console 2..6
+
+[MOUSE CONTROLS]
+  Super + Left Click      Drag and move window position
+  Super + Right Click     Resize window dimensions
+===================================================================
+EOF_TXT
+echo ""
+read -n 1 -s -r -p "Press any key to close..."
+'
+EOF_HELP
+        sudo chmod +x /usr/local/bin/keybind-help
+        sudo cp -f /usr/local/bin/keybind-help /usr/bin/keybind-help 2>/dev/null || true
     fi
 
     create_checkpoint "dotfiles"
