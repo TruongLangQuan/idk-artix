@@ -90,7 +90,7 @@ log_info "Deploying startdwl launcher script..."
 sudo tee /usr/local/bin/startdwl >/dev/null << 'EOF_DWL_LAUNCHER'
 #!/usr/bin/env bash
 [ -f "$HOME/.dwl/startup.sh" ] && bash "$HOME/.dwl/startup.sh" &
-exec dwl -s "slstatus -s"
+exec slstatus -s | dwl
 EOF_DWL_LAUNCHER
 sudo chmod +x /usr/local/bin/startdwl
 sudo cp -f /usr/local/bin/startdwl /usr/bin/startdwl 2>/dev/null || true
