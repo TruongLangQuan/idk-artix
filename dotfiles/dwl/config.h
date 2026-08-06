@@ -15,7 +15,7 @@ static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
 static const int showbar                   = 1;  /* 1 means show top bar */
 static const int topbar                    = 1;  /* 1 means bar is at top */
-static const char *fonts[]                 = {"JetBrains Mono:size=10"};
+static const char *fonts[]                 = {"monospace:size=10", "JetBrains Mono:size=10"};
 
 static const float rootcolor[]             = COLOR(0x000000ff);
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f};

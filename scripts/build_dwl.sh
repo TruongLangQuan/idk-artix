@@ -116,6 +116,9 @@ shiftview(const Arg *arg)
 EOF_SHIFT
 fi
 
+log_info "Patching setfloating for instant window auto-arrange..."
+sed -i "s/|| !c->mon->lt\[c->mon->sellt\]->arrange//g" dwl.c || true
+
 if [ -f "config.h" ]; then
     backup_target "${BUILD_DIR}/config.h"
 fi

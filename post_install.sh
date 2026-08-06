@@ -348,6 +348,9 @@ shiftview(const Arg *arg)
 EOF_SHIFT
         fi
 
+        log_info "Patching setfloating for instant window auto-arrange..."
+        sed -i "s/|| !c->mon->lt\[c->mon->sellt\]->arrange//g" dwl.c || true
+
         if [ -f "${SCRIPT_DIR}/dotfiles/dwl/config.h" ]; then
             cp -f "${SCRIPT_DIR}/dotfiles/dwl/config.h" "${BUILD_DIR_DWL}/config.h"
         fi
@@ -500,6 +503,10 @@ vo=gpu
 profile=fast
 gpu-api=vulkan
 EOF_MPV
+
+        # Deploy clean bashrc to root & skel
+        sudo cp -f "${SCRIPT_DIR}/dotfiles/bash/.bashrc" /root/.bashrc 2>/dev/null || true
+        sudo cp -f "${SCRIPT_DIR}/dotfiles/bash/.bashrc" /etc/skel/.bashrc 2>/dev/null || true
 
         # Deploy Fcitx5 config
         mkdir -p "${HOME}/.config/fcitx5"
