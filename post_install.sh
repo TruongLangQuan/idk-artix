@@ -479,11 +479,14 @@ EOF_NVIM
         cat << 'EOF_SWAYLOCK' > "${HOME}/.config/swaylock/config"
 color=000000
 font=JetBrains Mono
-indicator-radius=80
-inside-color=000000
-ring-color=333333
+indicator-radius=90
+indicator-thickness=6
 line-color=000000
-key-hl-color=ffffff
+ring-color=ffffff
+inside-color=000000
+key-hl-color=808080
+text-color=ffffff
+show-failed-attempts
 EOF_SWAYLOCK
 
         # Deploy MPV config

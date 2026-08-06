@@ -95,7 +95,7 @@ void shiftview(const Arg *arg);
 static const char *termcmd[]    = { "foot", NULL };
 static const char *menucmd[]     = { "sh", "-c", "pkill -x fuzzel || fuzzel", NULL };
 static const char *browsercmd[]  = { "zen-browser", NULL };
-static const char *lockcmd[]     = { "swaylock", NULL };
+static const char *lockcmd[]     = { "swaylock", "-f", NULL };
 static const char *shotcmd[]     = { "sh", "-c", "grim -g \"$(slurp)\" ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).png", NULL };
 static const char *clipcmd[]     = { "sh", "-c", "cliphist list | fuzzel | cliphist decode | wl-copy", NULL };
 static const char *layoutcmd[]   = { "fcitx5-remote", "-t", NULL };
