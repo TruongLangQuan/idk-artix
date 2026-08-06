@@ -189,8 +189,8 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
         }
         sudo swapon /mnt/swap/swapfile
 
-        log_info "Bootstrapping base system..."
-        sudo basestrap /mnt base base-devel openrc elogind-openrc linux-zen linux-zen-headers linux-lts linux-lts-headers linux-firmware intel-ucode
+        log_info "Bootstrapping base system & Wi-Fi/Audio firmware drivers..."
+        sudo basestrap /mnt base base-devel openrc elogind-openrc linux-zen linux-zen-headers linux-lts linux-lts-headers linux-firmware sof-firmware wireless-regdb intel-ucode
 
         log_info "Generating fstab..."
         sudo fstabgen -U /mnt | sudo tee -a /mnt/etc/fstab
@@ -207,7 +207,8 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
 
             echo 'root:${ROOT_PASS}' | chpasswd
 
-            pacman -Sy --noconfirm --needed grub efibootmgr btrfs-progs grub-btrfs networkmanager networkmanager-openrc seatd seatd-openrc dbus dbus-openrc bluez bluez-openrc ufw ufw-openrc
+            # Install bootloader & system packages cleanly (auto-resolving any package replacement prompts)
+            echo -e \"y\ny\ny\ny\ny\n\" | pacman -Sy --noconfirm --needed grub efibootmgr btrfs-progs grub-btrfs networkmanager networkmanager-openrc seatd dbus dbus-openrc bluez bluez-openrc ufw ufw-openrc wpa_supplicant iw
 
             for grp in wheel audio video input seat; do
                 groupadd -f \"\$grp\"
@@ -216,6 +217,7 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
             echo '${TARGET_USER}:${TARGET_PASS}' | chpasswd
             echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
 
+            # Install & configure GRUB bootloader
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Artix
             grub-mkconfig -o /boot/grub/grub.cfg
 
@@ -254,10 +256,10 @@ if checkpoint_exists "packages"; then
 else
     PACKAGES=(
         base base-devel btrfs-progs dbus dbus-openrc efibootmgr openrc elogind-openrc
-        grub grub-btrfs intel-ucode linux-firmware linux-lts linux-zen os-prober polkit snap-pac
+        grub grub-btrfs intel-ucode linux-firmware sof-firmware wireless-regdb linux-lts linux-zen os-prober polkit snap-pac
         snapper sudo zram-init zram-init-openrc bash-completion brightnessctl cairo cliphist
         fcitx5 fcitx5-configtool fcitx5-unikey foot fuzzel grim libinput libva libva-utils
-        libxkbcommon mesa pango pixman seatd seatd-openrc slurp swaylock ttf-jetbrains-mono
+        libxkbcommon mesa pango pixman seatd slurp swaylock ttf-jetbrains-mono
         vulkan-intel wayland wayland-protocols wlroots0.20 wlroots0.19 wl-clipboard xorg-xwayland
         bat btop ccache clang cmake eza fastfetch fd file fzf gcc gdb git go htop jdk-openjdk jq
         lazygit less lldb llvm ltrace lua make meson nano neovim ninja nodejs npm openssh pkgconf
@@ -266,6 +268,7 @@ else
         pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber fail2ban ufw ufw-openrc
         7zip curl wget unzip hwinfo lm_sensors networkmanager networkmanager-openrc
         network-manager-applet nvme-cli nvtop power-profiles-daemon powertop smartmontools
+        wpa_supplicant iw iwd
     )
 
     VALID_TO_INSTALL=()
