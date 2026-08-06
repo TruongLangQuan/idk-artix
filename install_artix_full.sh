@@ -159,24 +159,31 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
         done
         sudo umount /mnt
 
-        log_info "Mounting subvolumes with zstd:3 compression..."
+        log_info "Mounting root subvolume (@)..."
         sudo mount -o noatime,compress=zstd:3,subvol=@ "${PART_ROOT}" /mnt
-        sudo mkdir -p /mnt/{home,var/cache,var/log,var/cache/pacman/pkg,tmp,.snapshots,swap,boot/efi}
 
+        log_info "Creating base mount directories..."
+        sudo mkdir -p /mnt/{home,var/cache,var/log,tmp,.snapshots,swap,boot/efi}
+
+        log_info "Mounting subvolumes..."
         sudo mount -o noatime,compress=zstd:3,subvol=@home "${PART_ROOT}" /mnt/home
         sudo mount -o noatime,compress=zstd:3,subvol=@cache "${PART_ROOT}" /mnt/var/cache
-        sudo mount -o noatime,compress=zstd:3,subvol=@log "${PART_ROOT}" /mnt/var/log
+
+        # Create pacman pkg dir AFTER mounting @cache so mount point exists
+        sudo mkdir -p /mnt/var/cache/pacman/pkg
         sudo mount -o noatime,compress=zstd:3,subvol=@pkg "${PART_ROOT}" /mnt/var/cache/pacman/pkg
+
+        sudo mount -o noatime,compress=zstd:3,subvol=@log "${PART_ROOT}" /mnt/var/log
         sudo mount -o noatime,compress=zstd:3,subvol=@tmp "${PART_ROOT}" /mnt/tmp
         sudo mount -o noatime,compress=zstd:3,subvol=@snapshots "${PART_ROOT}" /mnt/.snapshots
         sudo mount -o noatime,subvol=@swap "${PART_ROOT}" /mnt/swap
         sudo mount "${PART_EFI}" /mnt/boot/efi
 
         log_info "Creating ${SWAP_SIZE_GB}GB Swapfile..."
-        sudo btrfs filesystem mkswapfile --size "${SWAP_SIZE_GB}g" --uuid clear /mnt/swap/swapfile || {
+        sudo btrfs filesystem mkswapfile --size "${SWAP_SIZE_GB}g" /mnt/swap/swapfile 2>/dev/null || {
             sudo truncate -s 0 /mnt/swap/swapfile
             sudo chattr +C /mnt/swap/swapfile 2>/dev/null || true
-            sudo fallocate -l "${SWAP_SIZE_GB}G" /mnt/swap/swapfile
+            sudo dd if=/dev/zero of=/mnt/swap/swapfile bs=1M count=$((SWAP_SIZE_GB * 1024)) status=progress
             sudo chmod 600 /mnt/swap/swapfile
             sudo mkswap /mnt/swap/swapfile
         }
@@ -199,28 +206,39 @@ if [ "$SKIP_DISK" = false ] && [ "$IS_LIVE_ISO" = true ]; then
             echo '${HOSTNAME}' > /etc/hostname
 
             echo 'root:${ROOT_PASS}' | chpasswd
-            useradd -m -G wheel,audio,video,input,seat ${TARGET_USER}
+
+            pacman -Sy --noconfirm --needed grub efibootmgr btrfs-progs grub-btrfs networkmanager networkmanager-openrc seatd seatd-openrc dbus dbus-openrc bluez bluez-openrc ufw ufw-openrc
+
+            for grp in wheel audio video input seat; do
+                groupadd -f \"\$grp\"
+            done
+            useradd -m -G wheel,audio,video,input,seat ${TARGET_USER} || true
             echo '${TARGET_USER}:${TARGET_PASS}' | chpasswd
             echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
 
-            pacman -S --noconfirm --needed grub efibootmgr btrfs-progs grub-btrfs networkmanager networkmanager-openrc seatd seatd-openrc dbus dbus-openrc bluez bluez-openrc ufw ufw-openrc
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Artix
             grub-mkconfig -o /boot/grub/grub.cfg
 
-            rc-update add NetworkManager default
-            rc-update add dbus default
-            rc-update add seatd default
-            rc-update add bluetooth default
-            rc-update add ufw default
+            rc-update add NetworkManager default 2>/dev/null || true
+            rc-update add dbus default 2>/dev/null || true
+            rc-update add seatd default 2>/dev/null || true
+            rc-update add bluetooth default 2>/dev/null || true
+            rc-update add ufw default 2>/dev/null || true
         "
 
         # Copy installer file to new system user directory for post-reboot run
         sudo mkdir -p "/mnt/home/${TARGET_USER}/idk-artix"
         sudo cp -rf "${SCRIPT_DIR}/"* "/mnt/home/${TARGET_USER}/idk-artix/" 2>/dev/null || true
-        sudo chown -R 1000:1000 "/mnt/home/${TARGET_USER}/idk-artix"
+        sudo chown -R 1000:1000 "/mnt/home/${TARGET_USER}/idk-artix" 2>/dev/null || true
 
-        log_success "Stage 0 Complete! Unmount and reboot into your system, then run:"
-        log_info "  ./install.sh --skip-disk"
+        # Clean unmount
+        sudo swapoff /mnt/swap/swapfile 2>/dev/null || true
+        sudo umount -R /mnt 2>/dev/null || true
+
+        log_success "Stage 0 Complete! Base system installed to ${TARGET_DISK}."
+        log_info "Please reboot now, remove the Live ISO, log into your new system as ${TARGET_USER}, and run:"
+        log_info "  cd ~/idk-artix && ./install.sh --skip-disk"
+        exit 0
     fi
 fi
 
