@@ -149,10 +149,19 @@ log_info "Compiling dwl with top bar support..."
 make clean
 make
 
-log_info "Installing dwl..."
+log_info "Installing dwl binary and wrapper script..."
 sudo make install
-sudo cp -f dwl /usr/bin/dwl 2>/dev/null || true
-sudo cp -f dwl /usr/local/bin/dwl 2>/dev/null || true
+sudo cp -f dwl /usr/local/bin/dwl.real
+sudo cp -f dwl /usr/bin/dwl.real 2>/dev/null || true
+
+sudo tee /usr/local/bin/dwl >/dev/null << 'EOF_DWL_WRAP'
+#!/usr/bin/env bash
+[ -f "$HOME/.dwl/startup.sh" ] && bash "$HOME/.dwl/startup.sh" &
+pkill -x slstatus 2>/dev/null || true
+exec stdbuf -oL /usr/local/bin/slstatus -s | /usr/local/bin/dwl.real "$@"
+EOF_DWL_WRAP
+sudo chmod +x /usr/local/bin/dwl
+sudo cp -f /usr/local/bin/dwl /usr/bin/dwl 2>/dev/null || true
 
 create_checkpoint "dwl"
 log_success "dwl (with built-in top bar) built and installed successfully."

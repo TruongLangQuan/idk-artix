@@ -369,8 +369,17 @@ EOF_SHIFT
 
         make clean && make
         sudo make install
-        sudo cp -f dwl /usr/bin/dwl 2>/dev/null || true
-        sudo cp -f dwl /usr/local/bin/dwl 2>/dev/null || true
+        sudo cp -f dwl /usr/local/bin/dwl.real
+        sudo cp -f dwl /usr/bin/dwl.real 2>/dev/null || true
+
+        sudo tee /usr/local/bin/dwl >/dev/null << 'EOF_DWL_WRAP'
+#!/usr/bin/env bash
+[ -f "$HOME/.dwl/startup.sh" ] && bash "$HOME/.dwl/startup.sh" &
+pkill -x slstatus 2>/dev/null || true
+exec stdbuf -oL /usr/local/bin/slstatus -s | /usr/local/bin/dwl.real "$@"
+EOF_DWL_WRAP
+        sudo chmod +x /usr/local/bin/dwl
+        sudo cp -f /usr/local/bin/dwl /usr/bin/dwl 2>/dev/null || true
         create_checkpoint "dwl"
     fi
 fi
@@ -528,8 +537,7 @@ EOF_STARTUP
         # Create system-wide startdwl launcher connecting slstatus bar to dwl
         sudo tee /usr/local/bin/startdwl >/dev/null << 'EOF_DWL_WRAPPER'
 #!/usr/bin/env bash
-[ -f "$HOME/.dwl/startup.sh" ] && bash "$HOME/.dwl/startup.sh" &
-exec stdbuf -oL slstatus -s | dwl
+exec dwl "$@"
 EOF_DWL_WRAPPER
         sudo chmod +x /usr/local/bin/startdwl
         sudo cp -f /usr/local/bin/startdwl /usr/bin/startdwl 2>/dev/null || true
