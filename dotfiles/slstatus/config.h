@@ -1,6 +1,6 @@
 /* slstatus config.h - Artix Suckless Workstation Status Bar Config
- * Version: 1.0
- * Native C modules, minimal update interval polling to preserve CPU.
+ * Version: 2.0
+ * Universal hardware metrics as documented in README.md.
  */
 
 /* interval between updates (in ms) */
@@ -13,9 +13,10 @@ static const char unknown_str[] = "n/a";
 #define MAXLEN 256
 
 static const struct arg args[] = {
-	/* function     format               argument */
-	{ ram_perc,     " [RAM %s%%]",       NULL },
-	{ cpu_perc,     " [CPU %s%%]",       NULL },
-	{ disk_perc,    " [SSD %s%%]",       "/" },
-	{ datetime,     " | %s",             "%Y-%m-%d %H:%M:%S" },
+	/* function     format                   argument */
+	{ ram_perc,     " [RAM %s%%]",           NULL },
+	{ cpu_perc,     " [CPU %s%%]",           NULL },
+	{ temp,         " [TEMP %s°C]",          "/sys/class/thermal/thermal_zone0/temp" },
+	{ disk_perc,    " [SSD %s%%]",           "/" },
+	{ datetime,     " | %s",                 "%Y-%m-%d %H:%M:%S" },
 };

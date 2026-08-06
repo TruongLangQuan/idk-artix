@@ -1,5 +1,5 @@
 /* dwl config.h - Artix Suckless Workstation
- * Version: 2.2 (Toggle Fuzzel Support & Top Bar Patch)
+ * Version: 2.3 (With Built-in Top Bar, Shiftview, & Full TTY Switch Keys)
  */
 
 #include <X11/XF86keysym.h>
@@ -84,7 +84,12 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 	{ MODKEY|WLR_MODIFIER_SHIFT, SKEY,           tag,             {.ui = 1 << TAG} }, \
 	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,SKEY,toggletag, {.ui = 1 << TAG} }
 
-#define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_XF86Switch_VT_##n, chvt, {.ui = (n)} }
+#define CHVT(n) \
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_XF86Switch_VT_##n, chvt, {.ui = (n)} }, \
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT, XKB_KEY_F##n,             chvt, {.ui = (n)} }
+
+/* Forward declaration for shiftview */
+void shiftview(const Arg *arg);
 
 /* Commands */
 static const char *termcmd[]    = { "foot", NULL };
@@ -106,14 +111,25 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_space,      spawn,          {.v = layoutcmd} },
 	{ MODKEY,                    XKB_KEY_f,          togglefullscreen,{0} },
 	{ MODKEY,                    XKB_KEY_e,          togglefullscreen,{0} },
+	{ MODKEY,                    XKB_KEY_s,          togglefloating, {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
 	{ MODKEY,                    XKB_KEY_t,          spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          spawn,          {.v = browsercmd} },
 	{ MODKEY,                    XKB_KEY_q,          killclient,     {0} },
 	{ MODKEY,                    XKB_KEY_l,          spawn,          {.v = lockcmd} },
 	{ MODKEY,                    XKB_KEY_v,          spawn,          {.v = clipcmd} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
 	{ 0,                         XKB_KEY_Print,      spawn,          {.v = shotcmd} },
+
+	/* Workspace Navigation via Super + Ctrl + Arrow & Ctrl + Shift + Arrow */
+	{ MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_Right,      shiftview,      {.i = +1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_Down,       shiftview,      {.i = +1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_Left,       shiftview,      {.i = -1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_Up,         shiftview,      {.i = -1} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_Right, shiftview,{.i = +1} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_Down,  shiftview,{.i = +1} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_Left,  shiftview,{.i = -1} },
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_Up,    shiftview,{.i = -1} },
 
 	/* Hardware media keys */
 	{ 0,                         XF86XK_AudioRaiseVolume, spawn,     {.v = volup} },

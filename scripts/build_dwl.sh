@@ -88,6 +88,27 @@ else
     log_warning "bar.patch already applied or could not be applied cleanly."
 fi
 
+if ! grep -q "void shiftview" dwl.c; then
+    log_info "Injecting shiftview function for smooth workspace navigation..."
+    cat << "EOF_SHIFT" >> dwl.c
+
+void
+shiftview(const Arg *arg)
+{
+	Arg a;
+	if (!selmon) return;
+	a.ui = selmon->tagset[selmon->seltags];
+	if (arg->i > 0)
+		a.ui = (a.ui << arg->i) | (a.ui >> (5 - arg->i));
+	else
+		a.ui = (a.ui >> -arg->i) | (a.ui << (5 + arg->i));
+	a.ui &= (1 << 5) - 1;
+	if (a.ui)
+		view(&a);
+}
+EOF_SHIFT
+fi
+
 if [ -f "config.h" ]; then
     backup_target "${BUILD_DIR}/config.h"
 fi
