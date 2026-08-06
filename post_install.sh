@@ -140,6 +140,53 @@ else
 fi
 
 # =================================================================
+# STAGE 1.5: MARKDOWN DOCUMENTATION PACKAGE AUDIT
+# =================================================================
+log_info "-----------------------------------------------------------------"
+log_info "STAGE 1.5: Verifying Packages Listed in Markdown Files"
+log_info "-----------------------------------------------------------------"
+
+audit_markdown_packages() {
+    local md_files=("${SCRIPT_DIR}/PACKAGE_LIST.md" "${SCRIPT_DIR}/README.md")
+    local md_missing=()
+    local md_installed=()
+
+    for md_file in "${md_files[@]}"; do
+        if [ -f "$md_file" ]; then
+            log_info "Parsing package requirements from ${md_file##*/}..."
+            local raw_words
+            raw_words=$(sed -n "/\`\`\`/,/\`\`\`/p" "$md_file" | grep -v "\`\`\`" | grep -v "^#" | sed "s/#.*//" | xargs -n1 | sort -u || true)
+
+            for word in $raw_words; do
+                if pacman -Qi "$word" >/dev/null 2>&1; then
+                    md_installed+=("$word")
+                elif pacman -Si "$word" >/dev/null 2>&1; then
+                    md_missing+=("$word")
+                fi
+            done
+        fi
+    done
+
+    readarray -t md_missing < <(printf '%s\n' "${md_missing[@]:-}" | sort -u)
+    readarray -t md_installed < <(printf '%s\n' "${md_installed[@]:-}" | sort -u)
+
+    log_info "Markdown Audit: ${#md_installed[@]} packages installed, ${#md_missing[@]} missing."
+
+    if [ ${#md_missing[@]} -gt 0 ] && [ -n "${md_missing[0]}" ]; then
+        if [ "$IS_DRY_RUN" = true ]; then
+            log_info "[DRY-RUN] Would install ${#md_missing[@]} missing Markdown-documented packages: ${md_missing[*]}"
+        else
+            log_info "Installing ${#md_missing[@]} missing packages documented in Markdown: ${md_missing[*]}"
+            echo -e "y\ny\ny\ny\ny\n" | sudo pacman -S --needed --noconfirm "${md_missing[@]}" || log_warning "Some packages could not be installed."
+        fi
+    else
+        log_success "All required packages documented in Markdown files are fully installed!"
+    fi
+}
+
+audit_markdown_packages
+
+# =================================================================
 # STAGE 2: BTRFS & SNAPPER CONFIGURATION
 # =================================================================
 log_info "-----------------------------------------------------------------"
@@ -338,10 +385,12 @@ eval "$(zoxide init bash)"
 EOF_BASH
 
         # Deploy Foot config
+        mkdir -p "${HOME}/.config/foot"
         cat << 'EOF_FOOT' > "${HOME}/.config/foot/foot.ini"
-[main]
+term=foot
 font=JetBrains Mono:size=11
 pad=12x12
+resize-delay-ms=0
 [colors-dark]
 background=000000
 foreground=cccccc
@@ -349,6 +398,9 @@ regular0=000000
 regular7=cccccc
 bright7=ffffff
 EOF_FOOT
+        sudo mkdir -p /root/.config/foot /etc/xdg/foot 2>/dev/null || true
+        sudo cp -f "${HOME}/.config/foot/foot.ini" /root/.config/foot/foot.ini 2>/dev/null || true
+        sudo cp -f "${HOME}/.config/foot/foot.ini" /etc/xdg/foot/foot.ini 2>/dev/null || true
 
         # Deploy Fuzzel config
         cat << 'EOF_FUZZEL' > "${HOME}/.config/fuzzel/fuzzel.ini"

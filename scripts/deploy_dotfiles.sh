@@ -81,6 +81,11 @@ for map in "${MAPPINGS[@]}"; do
     ln -sf "$src" "$target"
 done
 
+log_info "Deploying foot.ini to root & system-wide fallback..."
+sudo mkdir -p /root/.config/foot /etc/xdg/foot
+sudo cp -f "${DOTFILES_SRC}/foot/foot.ini" /root/.config/foot/foot.ini
+sudo cp -f "${DOTFILES_SRC}/foot/foot.ini" /etc/xdg/foot/foot.ini
+
 log_info "Deploying startdwl launcher script..."
 sudo tee /usr/local/bin/startdwl >/dev/null << 'EOF_DWL_LAUNCHER'
 #!/usr/bin/env bash

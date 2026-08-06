@@ -163,6 +163,27 @@ else
     report_status "WARN" "Security" "Fail2Ban client not installed."
 fi
 
+# 8. Markdown Documentation Package Audit
+log_info "--- Checking Markdown Documentation Packages ---"
+MD_FILE="${PROJECT_ROOT}/PACKAGE_LIST.md"
+if [ -f "$MD_FILE" ]; then
+    RAW_WORDS=$(sed -n "/\`\`\`/,/\`\`\`/p" "$MD_FILE" | grep -v "\`\`\`" | grep -v "^#" | sed "s/#.*//" | xargs -n1 | sort -u || true)
+    MD_MISSING=()
+    MD_INSTALLED_COUNT=0
+    for word in $RAW_WORDS; do
+        if pacman -Qi "$word" >/dev/null 2>&1; then
+            ((MD_INSTALLED_COUNT++))
+        elif pacman -Si "$word" >/dev/null 2>&1; then
+            MD_MISSING+=("$word")
+        fi
+    done
+    if [ ${#MD_MISSING[@]} -eq 0 ]; then
+        report_status "PASS" "Markdown Packages" "All ${MD_INSTALLED_COUNT} packages in PACKAGE_LIST.md are fully installed."
+    else
+        report_status "WARN" "Markdown Packages" "${#MD_MISSING[@]} package(s) listed in Markdown are missing: ${MD_MISSING[*]}"
+    fi
+fi
+
 log_info "=================================================="
 log_info "Summary: PASS: ${PASS_COUNT} | WARN: ${WARN_COUNT} | FAIL: ${FAIL_COUNT}"
 log_info "Healthcheck complete."

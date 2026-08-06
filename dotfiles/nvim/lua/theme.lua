@@ -1,6 +1,6 @@
 -- ~/.config/nvim/lua/theme.lua - Strict Monochrome Aesthetics
 
-vim.cmd("highlight Clear")
+vim.cmd("highlight clear")
 if vim.fn.exists("syntax_on") then
     vim.cmd("syntax reset")
 end
