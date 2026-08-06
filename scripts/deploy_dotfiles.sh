@@ -90,10 +90,37 @@ log_info "Deploying startdwl launcher script..."
 sudo tee /usr/local/bin/startdwl >/dev/null << 'EOF_DWL_LAUNCHER'
 #!/usr/bin/env bash
 [ -f "$HOME/.dwl/startup.sh" ] && bash "$HOME/.dwl/startup.sh" &
-exec slstatus -s | dwl
+exec stdbuf -oL slstatus -s | dwl
 EOF_DWL_LAUNCHER
 sudo chmod +x /usr/local/bin/startdwl
 sudo cp -f /usr/local/bin/startdwl /usr/bin/startdwl 2>/dev/null || true
+
+log_info "Deploying zen-browser launcher script..."
+sudo tee /usr/local/bin/zen-browser >/dev/null << 'EOF_ZEN'
+#!/usr/bin/env bash
+if command -v flatpak &>/dev/null && flatpak info app.zen_browser.zen &>/dev/null; then
+    exec flatpak run app.zen_browser.zen "$@"
+elif [ -x "$HOME/.local/zen/zen" ]; then
+    exec "$HOME/.local/zen/zen" "$@"
+elif [ -x "$HOME/zen/zen" ]; then
+    exec "$HOME/zen/zen" "$@"
+elif [ -x "/opt/zen/zen" ]; then
+    exec /opt/zen/zen "$@"
+elif command -v zen-browser-bin &>/dev/null; then
+    exec zen-browser-bin "$@"
+elif command -v zen &>/dev/null; then
+    exec zen "$@"
+else
+    ZEN_PATH="$(find $HOME /opt /usr -name "zen" -type f -executable 2>/dev/null | grep -v "node_modules" | head -n 1)"
+    if [ -n "$ZEN_PATH" ]; then
+        exec "$ZEN_PATH" "$@"
+    else
+        exec firefox "$@"
+    fi
+fi
+EOF_ZEN
+sudo chmod +x /usr/local/bin/zen-browser
+sudo cp -f /usr/local/bin/zen-browser /usr/bin/zen-browser 2>/dev/null || true
 
 log_info "Deploying keybind-help tutorial script..."
 sudo tee /usr/local/bin/keybind-help >/dev/null << 'EOF_HELP'
