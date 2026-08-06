@@ -96,15 +96,22 @@ void
 shiftview(const Arg *arg)
 {
 	Arg a;
+	uint32_t cur;
+	int i, tag = 0;
 	if (!selmon) return;
-	a.ui = selmon->tagset[selmon->seltags];
+	cur = selmon->tagset[selmon->seltags];
+	for (i = 0; i < 5; i++) {
+		if (cur & (1 << i)) {
+			tag = i;
+			break;
+		}
+	}
 	if (arg->i > 0)
-		a.ui = (a.ui << arg->i) | (a.ui >> (5 - arg->i));
+		tag = (tag + 1) % 5;
 	else
-		a.ui = (a.ui >> -arg->i) | (a.ui << (5 + arg->i));
-	a.ui &= (1 << 5) - 1;
-	if (a.ui)
-		view(&a);
+		tag = (tag - 1 + 5) % 5;
+	a.ui = 1 << tag;
+	view(&a);
 }
 EOF_SHIFT
 fi

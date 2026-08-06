@@ -308,9 +308,8 @@ else
     if ! checkpoint_exists "dwl"; then
         sudo pacman -S --needed --noconfirm fcft tllist pixman libinput xkbcommon wayland-protocols 2>/dev/null || true
         mkdir -p "$HOME/src"
-        if [ ! -d "$BUILD_DIR_DWL" ]; then
-            git clone https://codeberg.org/dwl/dwl.git "$BUILD_DIR_DWL"
-        fi
+        rm -rf "$BUILD_DIR_DWL"
+        git clone https://codeberg.org/dwl/dwl.git "$BUILD_DIR_DWL"
         cd "$BUILD_DIR_DWL"
 
         log_info "Downloading and applying official dwl top bar patch (bar.patch)..."
@@ -329,15 +328,22 @@ void
 shiftview(const Arg *arg)
 {
 	Arg a;
+	uint32_t cur;
+	int i, tag = 0;
 	if (!selmon) return;
-	a.ui = selmon->tagset[selmon->seltags];
+	cur = selmon->tagset[selmon->seltags];
+	for (i = 0; i < 5; i++) {
+		if (cur & (1 << i)) {
+			tag = i;
+			break;
+		}
+	}
 	if (arg->i > 0)
-		a.ui = (a.ui << arg->i) | (a.ui >> (5 - arg->i));
+		tag = (tag + 1) % 5;
 	else
-		a.ui = (a.ui >> -arg->i) | (a.ui << (5 + arg->i));
-	a.ui &= (1 << 5) - 1;
-	if (a.ui)
-		view(&a);
+		tag = (tag - 1 + 5) % 5;
+	a.ui = 1 << tag;
+	view(&a);
 }
 EOF_SHIFT
         fi
@@ -378,9 +384,8 @@ if [ "$IS_DRY_RUN" = true ]; then
 else
     if ! checkpoint_exists "slstatus"; then
         mkdir -p "$HOME/src"
-        if [ ! -d "$BUILD_DIR_SL" ]; then
-            git clone https://git.suckless.org/slstatus "$BUILD_DIR_SL"
-        fi
+        rm -rf "$BUILD_DIR_SL"
+        git clone https://git.suckless.org/slstatus "$BUILD_DIR_SL"
         cd "$BUILD_DIR_SL"
 
         if [ -f "${SCRIPT_DIR}/dotfiles/slstatus/config.h" ]; then
