@@ -13,12 +13,9 @@ static const char unknown_str[] = "n/a";
 #define MAXLEN 256
 
 static const struct arg args[] = {
-	/* function     format                                      argument */
-	{ ram_used,     " [RAM %s/",                                 NULL },
-	{ ram_total,    "%s]",                                       NULL },
-	{ disk_perc,    " [SSD %s%%]",                               "/" },
-	{ cpu_perc,     " [CPU %s%%]",                               NULL },
-	{ temp,         " [%s°C]",                                   "/sys/class/thermal/thermal_zone0/temp" },
-	{ netspeed_rx,  " [NET %sB/s]",                              "wlan0" },
-	{ datetime,     " | %s",                                     "%H:%M:%S %Y-%m-%d" },
+	/* function     format               argument */
+	{ ram_perc,     " [RAM %s%%]",       NULL },
+	{ cpu_perc,     " [CPU %s%%]",       NULL },
+	{ disk_perc,    " [SSD %s%%]",       "/" },
+	{ datetime,     " | %s",             "%Y-%m-%d %H:%M:%S" },
 };

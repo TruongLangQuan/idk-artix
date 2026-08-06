@@ -29,6 +29,7 @@ show_help() {
 Usage: $(basename "$0") [OPTIONS]
 
 Options:
+  -f, --force      Force re-running all stages (clears existing checkpoint state).
   -d, --dry-run    Run setup simulation without modifying system.
   -h, --help       Show this help message.
 
@@ -42,6 +43,7 @@ EOF
 # Parse Arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        -f|--force)    rm -rf "${STATE_DIR}"/*.done 2>/dev/null || true; shift ;;
         -d|--dry-run)  IS_DRY_RUN=true; shift ;;
         -h|--help)     show_help; exit 0 ;;
         *)             log_error "Unknown option: $1"; show_help; exit 1 ;;
@@ -363,6 +365,7 @@ border=444444ff
 EOF_FUZZEL
 
         # Deploy Neovim Lua Config
+        mkdir -p "${HOME}/.config/nvim"
         cat << 'EOF_NVIM' > "${HOME}/.config/nvim/init.lua"
 vim.g.mapleader = " "
 vim.opt.number = true
@@ -371,10 +374,11 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.termguicolors = true
-vim.cmd("colorscheme dim")
+vim.cmd("colorscheme quiet")
 EOF_NVIM
 
         # Deploy Swaylock config
+        mkdir -p "${HOME}/.config/swaylock"
         cat << 'EOF_SWAYLOCK' > "${HOME}/.config/swaylock/config"
 color=000000
 font=JetBrains Mono
@@ -386,6 +390,7 @@ key-hl-color=ffffff
 EOF_SWAYLOCK
 
         # Deploy MPV config
+        mkdir -p "${HOME}/.config/mpv"
         cat << 'EOF_MPV' > "${HOME}/.config/mpv/mpv.conf"
 hwdec=auto
 vo=gpu
@@ -394,12 +399,14 @@ gpu-api=vulkan
 EOF_MPV
 
         # Deploy Fcitx5 config
+        mkdir -p "${HOME}/.config/fcitx5"
         cat << 'EOF_FCITX' > "${HOME}/.config/fcitx5/config"
 [Hotkey]
 TriggerKeys=Control+space
 EOF_FCITX
 
         # Deploy DWL Startup script
+        mkdir -p "${HOME}/.dwl"
         cat << 'EOF_STARTUP' > "${HOME}/.dwl/startup.sh"
 #!/usr/bin/env bash
 pipewire &
@@ -415,6 +422,7 @@ EOF_STARTUP
 exec dwl -s slstatus
 EOF_DWL_WRAPPER
         sudo chmod +x /usr/local/bin/startdwl
+        sudo cp -f /usr/local/bin/startdwl /usr/bin/startdwl 2>/dev/null || true
     fi
 
     create_checkpoint "dotfiles"
